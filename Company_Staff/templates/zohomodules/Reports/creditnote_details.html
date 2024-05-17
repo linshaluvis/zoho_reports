@@ -1,0 +1,727 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load social_share %}
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/print-this/printThis.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<!-- <script src="https://kit.fontawesome.com/30ecc6e708.js" crossorigin="anonymous"></script> -->
+
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+
+<!-- recuring invoice -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- end -->
+
+
+<style>
+    
+    .bar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+
+
+    }
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .bar .left input {
+        height: 5vh;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    #search-dropdown {
+        position: absolute;
+    }
+
+    @media print {
+        * {
+            background: transparent !important;
+            color: #000 !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            font-size: 100%;
+
+        }
+
+        .bar,
+        #nav1,
+        header {
+            display: none;
+        }
+
+        #div2 {
+            position: absolute;
+            top: -100px;
+            text-align: center;
+            width: 100%;
+        }
+
+
+    }
+    #customizeMenu{
+        width: fit-content;
+        height: 50vh;
+        overflow-y: auto;
+    }
+
+    :root {
+        --body-bg: rgb(204, 204, 204);
+        --white: #ffffff;
+        --darkWhite: #ccc;
+        --black: #000000;
+        --dark: #615c60;
+        --themeColor: #dfbc0c;
+        --pageShadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+    }
+    @media print {
+        body{
+            visibility: hidden !important;
+            /* background-color: white; */
+        }
+
+        .printContainer {
+            visibility: visible !important;
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+    }
+
+    .page {
+        background: var(--white);
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: var(--pageShadow);
+    }
+
+    .page[size="A4"] {
+        width: 99%;
+        height: 29.7cm;
+        overflow: hidden;
+    }
+    #reportTable {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #reportTable th, #reportTable td {
+        border: 1px solid #dddddd;
+        padding: 5px 2px;
+        color: #000;
+    }
+
+    /* .whatsapp-this{
+      display: flex;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px 0px;
+    }
+
+    .whatsapp-this:hover{
+      background-color: rgb(255 255 255 / 0.21);
+    } */
+
+    .submitShareEmailBtn {
+        background: #192d3e;
+        border: 1px solid #3a4b5a;
+        border-radius: 4px;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+    }
+    .submitShareEmailBtn:hover {
+        background: #3a4b5a;
+    }
+
+    .content {
+        display: none;
+        position: absolute;
+        background-color: black;
+        min-width: 350px;
+        min-height: 250px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        height: fit-content;
+        z-index: 1;
+    }
+
+    .arrow {
+        /* font-size: 0.6em; */
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .arrow.up {
+        transform: rotate(180deg);
+    }
+    .inputdate::-webkit-calendar-picker-indicator {
+    filter: invert(100%);
+}
+</style>
+<body>       
+    <div class="body-wrapper">
+        <div class="container-fluid ">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb text-light">
+                    {% if log_details.user_type == 'Staff' %}
+                        <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    {% if log_details.user_type == 'Company' %}
+                        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item" aria-current="page">Credit Note Details</li>
+                </ol>
+            </nav>
+            
+            {% for m in messages %}
+            <div id="message" class="message py-3" style="background-color: #ffae1f;color: black;border-radius: 5px;">
+                <center><h2>{{ m }}</h2></center>
+            </div>
+            {% endfor %}
+            <script>
+                // Wait for the DOM to be fully loaded
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Get the message element
+                    var message = document.getElementById("message");
+
+                    // Function to hide the message after 3 seconds
+                    function hideMessage() {
+                        message.style.display = "none";
+                    }
+
+                    // Show the message
+                    message.style.display = "block";
+
+                    // Schedule hiding the message after 3 seconds
+                    setTimeout(hideMessage, 3000); // 3000 milliseconds = 3 seconds
+                });
+            </script>
+
+                <div class=" mt-lg-4 mt-2 rounded p-4" style="background-color: rgb(0, 0, 0);color: white;">
+                    <h1 class="text-light">Credit Note Details</h1>
+                    <br>
+                
+                    <div class="row">
+                        <div class="col-md-6 d-flex p-2 ">
+
+                          <div class="">
+                            <div class="position-relative">
+                                <button class="btn btn-warning" onclick="toggleContent()"><i class="fas fa-solid fa-gear"></i> Customize Report</button>
+                                <div id="contentDiv" class="content mt-2">
+                                    <h6 style="color: white;">Customize Report</h6>
+                                    <form action="" class="form reportCustomizeForm" method="get">
+                                        <div class="px-2">
+                                            <label style="text-align:left ">From</label><br>
+                                            <input name="from_date" style="color: white;" class="inputdate form-control" type="date" id="startDate" value="{{startDate}}">
+                                        </div>
+                                        <div class="px-2 pt-2">
+                                            <label style="text-align:left ">To</label><br>
+                                            <input name="to_date" type="date" style="color: white;" class="inputdate form-control" id="endDate" value="{{endDate}}">
+                                        </div>
+                                        <div class="px-2 pt-2">
+                                            <label style="text-align:left;color: white;">Credit Note Status</label><br>
+                                            <select name="status" id="status" style="color: white;background-color: black;" class="form-control">
+                                                <option value="All">All</option>
+                                                <option value="Saved">Saved</option>
+                                                <option value="Draft">Draft</option>
+                                            </select>
+                                        </div>
+                                        <div class="d-flex px-2 mt-3 mb-4">
+                                            <button type="submit" class="btn btn-outline-light w-50">Run Report</button>
+                                            <button type="reset" onclick="toggleContent()" class="btn btn-outline-light ml-1 w-50">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                          </div>
+                          
+                              
+                              
+                        </div>
+                        
+                        
+                        <div class="col-md-6 d-flex justify-content-end h-100 p-2">
+                           
+                            <div class="row">
+                                <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" onclick="exportToExcel()" class="btn btn-outline-warning col-md " >
+                                    <i class="fa fa-file-excel p-1" style="font-size: large;"></i>
+                                    <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+                                  </a>&nbsp;&nbsp;
+                                
+                                <!-- <a href="#" id="importBtn" class="btn btn-outline-warning ms-1">
+                                    <i class="fa fa-file-import ms-1" style="color: #FFD43B;" aria-hidden="true"></i> Import
+                                </a> -->
+                                <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" onclick="export_as_pdf()" id="generate_pdf_button" class="btn btn-outline-warning col-md" >
+                                    <i class="fa fa-file-pdf-o  p-1" style="font-size: large;"></i>
+                                    <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Pdf</span>
+                                  </a>&nbsp;&nbsp;
+    
+                                  <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" onclick="printTable()" class="btn btn-outline-warning col-md mb-3 mr-2" >
+                                    <i class="fa fa-print p-1" style="font-size: large;"></i>
+                                    <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Print</span>
+                                  </a>&nbsp;&nbsp;
+    
+                                  <a class="btn btn-outline-warning col-md" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;">
+                                    <i class="fa  fa-share  p-1" style="font-size: large;"></i>
+                                    <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Share</span>
+                                  </a>
+                                
+                                <div class="dropdown-menu bg-black w-25">
+                                    <a class="dropdown-item" style="color: #ffae1f;cursor: pointer;" data-toggle="modal" data-target="#shareToEmail">Email</a>
+                                    <a class="dropdown-item" style="color: #ffae1f; cursor: pointer;" onclick="sendWhatsApp()">Whatsapp</a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                 
+                   
+                    <!-- price lists table -->
+                    <div class="table-responsive " style="overflow-x:auto;margin-top: 20px;">
+                        <div class="card radius-15 print-only" id="pdf-card" style="background-color: #000;" >
+                            <div class="card-body-md">
+                                <div class="container-fluid-md" >
+                    
+                                    <div  id="printReport"  class="printReportTemplate" style="display: block;">
+                                        <div class="my-md-5 page" size="A4" >
+                                            <div id="printdiv2" >
+                                                <div class="py-4 bg-warning" >
+                                                    <!-- <div id="ember2512" class="col-md-4 d-flex justify-content-start tooltip-container ember-view ribbon text-ellipsis"></div> -->
+                                                    <div class="col-12" id="printHead">
+                                                            <center class="h5 text-white"><b>{{companyName}}</b></center>
+                                                            <center class="h3 text-white"><b>CREDIT NOTE DETAILS</b></center>
+                                                            
+                                                    </div>  
+                                                    <div id="filterDateDiv"><center><span id="filterDate"></span></center></div>
+                                                </div>
+                                                <div class="row px-1 py-1">
+                                                    <div class="col-12">
+                    
+                                                        
+                                                            <div class="container-fluid table-responsive-md" id="tableDiv">
+                                                                <table class="table mt-4" id="table">
+                                                                    <thead>
+                                                                        <tr class="text-center " style="color: black;">
+                                                                            <!-- <th>#</th> -->
+                                                                            <!-- <th>DATE</th> -->
+                                                                            <th>STATUS</th>
+                                                                            <th>CREDIT NOTE DATE</th>
+                                                                            <th>CREDIT NOTE NUMBER</th>
+                                                                            <th>CUSTOMER NAME</th>
+                                                                            <th>CREDIT NOTE AMOUNT</th>
+                                                                            <th>BALANCE AMOUNT</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for a in credit %}
+                                                                        <tr class='clickable-row text-center' style="color: black;">
+                                                                            <!-- <td>{{ forloop.counter }}</td>
+                                                                            <td>{{ a.credit_note_date }}</td> -->
+                                                                            <td>{{ a.status }}</td>
+                                                                            <td>{{a.credit_note_date}}</td>
+                                                                            <td>{{ a.credit_note_number }}</td>
+                                                                            <td>{{ a.customer.first_name }} {{ a.customer.last_name }}</td>
+                                                                            <td>{{ a.grand_total }} </td>
+                                                                            <td>{{ a.balance }}</td>
+                                                                        </tr>
+                                                                        {%endfor%}  
+                                                                    </tbody>
+                                                                </table>
+                                                                <br>
+                                                
+                                                            <div class="mx-4 mt-3" style="color: rgb(103, 102, 102);font-size: large;" >
+                                                                <span style="font-weight: 600;">Total Customers : <span id="customerCount">{{totalCustomer}}</span></span>
+                                                                <label style="float: right;font-weight: 600;color: #000;" >Credit Note Amount : <span id="creditAmount"></span> </label>
+                                                            </div>
+                                                            <div class="mx-4 mt-3" style="color: rgb(103, 102, 102);font-size: large;display: none;"  >
+                                                                <span style="font-weight: 600;">Total Credit Notes : <span id="creditCount">{{totalCreditNoteCount}}</span></span>
+                                                            </div>
+                                                            </div>
+                                                    </div>
+                                                        
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <!-- modal email -->
+                    <div class="modal fade" id="shareToEmail">
+                        <div class="modal-dialog">
+                          <div class="modal-content" style="background-color: #3b3b3b;">
+                            <div class="modal-header">
+                              <h3 class="modal-title text-light" id="exampleModalLabel">Share Credit Note Details</h3>
+                              <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body mx-3" style="background-color: #000;">
+                              <form action='{% url "sendEmail_creditnotedetails" %}' method="post" id="share_to_email_form" class="needs-validation" novalidate enctype="multipart/form-data">
+                                {%csrf_token%}
+                                <div class="form-group">
+                                    <label for="emailIds">Email IDs</label>
+                                    <textarea class="form-control" name="email_ids" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." autocomplete="on" required></textarea>
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label for="item_unitname">Message(optional)</label>
+                                    <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                                </div>
+                                <div class="row mt-3">
+                                  <div class="col-md-4"></div>
+                                  <div class="col-md-4">
+                                    <div class="d-flex">
+                                      <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="submit" >Save</button> 
+                                      <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" data-dismiss="modal" type="reset" value="Close">
+                                    </div>
+                                  </div>
+                                  <div class="col-md-4"></div>
+                                </div>
+                                <div id="mmm" style="display: none;">
+                                    <input type="text" name="count" id="count">
+                                    <input type="text" name="totalAmount" id="totalAmount">
+                                    <input type="date" name="start_date" id="start_date">
+                                    <input type="date" name="end_date" id="end_date">
+                                    <input type="text" name="totalCustomer" id="totalCustomer">
+                                    <input type="text" name="statusVal" id="statusVal">
+                                </div>
+                              </form>
+                            </div>
+                            <div class="modal-footer"></div>
+                          </div>
+                        </div>
+                      </div>
+
+<script>
+
+function sendWhatsApp() {
+    // Page link you want to send
+    var pageLink = window.location.href;
+
+    // Message to include in the WhatsApp message
+    var message = "Your requested Credit Note Details Page: " + pageLink;
+
+    // Create the share link
+    var shareLink = "https://wa.me/?text=" + encodeURIComponent(message);
+
+    // Open a new window/tab with the share link
+    window.open(shareLink, '_blank');
+}
+
+
+
+
+// pdf
+
+
+
+
+function export_as_pdf() {
+    const content = document.getElementById('printdiv2');
+    html2pdf().from(content).save('credit_note_details.pdf');
+  }
+
+  function sPdf(){
+    
+    var element = document.getElementById('printdiv2');
+    var opt =
+    {
+        margin: 1,
+        filename: 'CreditNote_details.pdf',
+        image: { type: 'png', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+
+
+
+// print
+function printTable() {
+    var table = document.getElementById('tableDiv');
+    var head2 = document.getElementById('printHead');
+    var date = document.getElementById('filterDateDiv');
+    if (table) {
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Print Table</title>');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">'); // Link Bootstrap CSS
+        printWindow.document.write('<style>@media print {table {width: 100%; border-collapse: collapse; margin-bottom: 1rem;} th, td {border: 1px solid #dee2e6; padding: .75rem; vertical-align: top;} thead {background-color: #f8f9fa;} .heading {text-align: center; margin-top: 1rem; font-size: 20px;}}</style>'); // Inline CSS styles for the table and heading
+        printWindow.document.write('</head><body>');
+        // printWindow.document.write('<h1 class="heading">Credit Note Details</h1>'); // Heading added
+        printWindow.document.write('<div id="printHead" style="font-size: 24px;">' + head2.innerHTML + '</div>'); 
+        printWindow.document.write(date.innerHTML);
+        printWindow.document.write('<br>');
+        printWindow.document.write(table.outerHTML); // Write the HTML content of the table
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+    } else {
+        console.error('Table with ID "table" not found.');
+    }
+}
+
+
+
+
+
+// excel
+function exportToExcel() {
+    var table = document.getElementById('table');
+    var rows = table.querySelectorAll('tbody tr');
+    var data = [];
+
+    // Append table headers
+    var headers = [];
+    table.querySelectorAll('thead th').forEach(function(header) {
+        headers.push(header.textContent.trim());
+    });
+    data.push(headers);
+
+    // Append table body
+    rows.forEach(function(row) {
+        if (row.style.display !== 'none') { // Check if the row is visible
+            var rowData = [];
+            row.querySelectorAll('td').forEach(function(cell) {
+                rowData.push(cell.textContent.trim());
+            });
+            data.push(rowData);
+        }
+    });
+
+    // Create worksheet
+    var ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Create workbook
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Save workbook to file
+    XLSX.writeFile(wb, 'Credit_Note_Details.xlsx');
+}
+
+
+
+
+// date filter
+  document.addEventListener("DOMContentLoaded", function() {
+    var form = document.querySelector('.reportCustomizeForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        
+        // Extract the selected dates
+        var startDateValue = document.getElementById('startDate').value;
+        var endDateValue = document.getElementById('endDate').value;
+
+        var fromDate = startDateValue ? new Date(startDateValue) : 0;
+        var toDate = endDateValue ? new Date(endDateValue) : 0;
+        var statusValue = document.getElementById('status').value;
+
+        console.log(fromDate,'--to---',toDate);
+        
+        if (fromDate === 0 || toDate === 0){
+            
+            // Filter table rows based on the selected dates
+            filterTableByDates2(statusValue);
+        
+        }else{
+            // Set the values of the "filterDate" field
+            var filterDateField = document.getElementById('filterDate');
+            filterDateField.innerHTML = fromDate.toISOString().slice(0,10) +  ' to ' +  toDate.toISOString().slice(0,10);
+            
+            // Filter table rows based on the selected dates
+            filterTableByDates(fromDate, toDate, statusValue);
+        }
+        
+
+        
+    });
+});
+
+function filterTableByDates(fromDate, toDate, statusValue) {
+    // Subtract one day from fromDate
+    var fromDateOneDayBefore = new Date(fromDate);
+    fromDateOneDayBefore.setDate(fromDateOneDayBefore.getDate() - 1);
+
+    var tableRows = document.querySelectorAll('#table tbody tr');
+    
+    for (var i = 0; i < tableRows.length; i++) {
+        var rowDate = new Date(tableRows[i].getElementsByTagName('td')[1].textContent); // Assuming date column is the second column (index 1)
+        var rowStatus = tableRows[i].getElementsByTagName('td')[0].textContent; // Assuming status column is the first column (index 0)
+        
+        // Extract only the date portion of rowDate
+        var rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+        
+        // Check if statusValue is "All" or matches the row's status
+        var statusMatches = (statusValue === "All" || rowStatus === statusValue);
+        
+        if ((statusValue === "All" && rowDateOnly >= fromDateOneDayBefore && rowDateOnly <= toDate) || 
+            (statusMatches && rowDateOnly >= fromDateOneDayBefore && rowDateOnly <= toDate)) {
+            tableRows[i].style.display = ''; // Show rows that fall within the selected date range and match the status
+        } else {
+            tableRows[i].style.display = 'none'; // Hide rows that are outside the selected date range or don't match the status
+        }
+    }
+    
+    // Set the start date and end date inputs
+    document.getElementById('start_date').value = fromDate.toISOString().slice(0,10);
+    document.getElementById('end_date').value = toDate.toISOString().slice(0,10);
+    var contentDiv = document.getElementById("contentDiv");
+    contentDiv.style.display = "none";
+    
+    // Call other functions as needed
+    calculateTotal();
+    countCustomerTotal();
+}
+
+function filterTableByDates2(statusValue) {
+    var tableRows = document.querySelectorAll('#table tbody tr');
+    
+    if (statusValue === "All") {
+        // Show all rows if statusValue is "All"
+        for (var i = 0; i < tableRows.length; i++) {
+            tableRows[i].style.display = '';
+        }
+    } else {
+        for (var i = 0; i < tableRows.length; i++) {
+            var rowStatus = tableRows[i].getElementsByTagName('td')[0].textContent; // Assuming status column is the first column (index 0)
+
+            // Check if statusValue matches the row's status
+            var statusMatches = (statusValue === rowStatus);
+
+            if (statusMatches) {
+                tableRows[i].style.display = ''; // Show rows that match the status
+            } else {
+                tableRows[i].style.display = 'none'; // Hide rows that don't match the status
+            }
+        }
+    }
+
+    // Hide contentDiv
+    var contentDiv = document.getElementById("contentDiv");
+    contentDiv.style.display = "none";
+
+    // Call other functions as needed
+    calculateTotal();
+    countCustomerTotal();
+}
+
+
+
+
+
+
+
+
+
+
+    // total credit note amount
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // Wait for the DOM to be fully loaded
+        calculateTotal();
+        countCustomerTotal()
+    });
+
+    function calculateTotal() {
+    var table = document.getElementById('table');
+    var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    var total = 0;
+    var count = 0;
+
+    // Loop through each row
+    for (var i = 0; i < rows.length; i++) {
+        // Check if the row is visible
+        if (rows[i].style.display !== 'none') {
+            var cells = rows[i].getElementsByTagName('td');
+            var amount = parseFloat(cells[cells.length - 1].textContent);
+            total += isNaN(amount) ? 0 : amount;
+            count += 1;
+        }
+    }
+
+    // Update the total in the designated element
+    document.getElementById('creditAmount').textContent = total.toFixed(2);
+    document.getElementById('creditCount').textContent = count;
+    document.getElementById('totalAmount').value = total.toFixed(2);
+    document.getElementById('count').value = count;
+    document.getElementById('totalAmount').value = total.toFixed(2);
+}
+
+// count number of unique customers
+function countCustomerTotal() {
+    var tableRows = document.querySelectorAll('#table tbody tr');
+    var uniqueNames = new Set();
+    var sttus = document.getElementById('status').value;
+
+    // Iterate through visible rows
+    for (var i = 0; i < tableRows.length; i++) {
+        // Check if the row is visible
+        if (tableRows[i].style.display !== 'none') {
+            var name = tableRows[i].getElementsByTagName('td')[3].textContent.trim();
+            uniqueNames.add(name);
+        }
+    }
+    document.getElementById('customerCount').innerHTML = uniqueNames.size;
+    document.getElementById('totalCustomer').value = uniqueNames.size;
+    document.getElementById('statusVal').value = sttus;
+}
+
+
+</script>
+  <script>
+    
+    function toggleContent() {
+        var contentDiv = document.getElementById("contentDiv");
+        if (contentDiv.style.display === "block") {
+            contentDiv.style.display = "none";
+        } else {
+            contentDiv.style.display = "block";
+            
+        }
+    }
+
+  </script>  
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- ashikh -->
+
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+
+<style>
+  .modal{
+    z-index: 9999;
+    overflow: scroll;
+  }
+  .selectize-input {
+    background-color: #000 !important;
+    color: white !important;
+}
+
+.selectize-input input {
+    color: white !important;
+}
+
+  /* .form-group{
+    width: 40%;
+  } */
+
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  @media screen and (max-width: 600px) {
+    .col-25, .col-75, input[type=submit] {
+      width: 100%;
+      margin-top: 0;
+    }
+
+    input[type=text], select, textarea {
+      width: 100%;
+    }
+  }
+
+  .dropdown input,
+  .dropdown button {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+
+  .dropdown.open input,
+  .dropdown.open button {
+    display: block;
+  }
+
+  .row a{
+    color: rgb(218, 164, 48);
+    font-size: 12px;
+  }
+
+  .table th a{
+    color:rgb(218, 164, 48);
+    font-size: 11px;
+    margin-left: 100px;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+
+  .item{
+    height: auto;
+  }
+
+  .labels{
+    color: white; 
+    font-size:2.5vh; 
+    font-weight: bolder;
+  }
+
+  .btn-outline-warning:hover {
+    color: black !important;
+    font-weight: bold;
+  }
+  .dropdown-item.customers-options:hover, .dropdown-item.items-options:hover{
+    background: white !important;
+    color: black !important;
+    cursor: pointer;
+  }
+</style>
+<style>
+  label{
+      color: white;
+  }
+  .section-3
+  {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      margin-top: 1rem;
+  }
+  .section-3 .section-toggle
+  {
+      margin-bottom: 0.50rem;
+  }
+   .section-toggle a
+  {
+
+      color: rgb(230, 171, 45);
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-size:1.275rem;
+  }
+  .add_another
+  {
+     
+      color: rgb(230, 171, 45);
+  }
+  #tbl thead th{
+      font-size: 0.785rem;
+  }
+  @media (max-width:700px)
+  {
+  .section-3
+  {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr ;  
+
+  }
+  .section-3 .section-toggle a
+  {
+
+      color: rgb(230, 171, 45);
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-size:0.875rem;
+  }
+  }
+ 
+
+
+  /* Account Modal */
+
+  .select-box1 {
+      position: relative;
+      width: 100%;
+  }
+  
+
+  .select-option1 {
+      position: relative;
+      
+  }
+
+  .select-option1 input {
+      width: 100%;
+      cursor: pointer;
+      background-color: white;
+      color: black;
+      border-radius: 7px;
+      padding: 10px 15px;
+      border: 0 !important;
+      outline: 0 !important;
+  }
+
+  .select-option1:after {
+      content: "";
+      border-top: 12px solid #000;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -8px;
+
+  }
+
+  .content1 {
+      background-color: white;
+      position: absolute;
+      color: black;
+      border-radius: 7px;
+      margin-top: 15px;
+      width: 100%;
+      z-index: 999;
+      padding: 20px;
+      display: none;
+  }
+
+  .search1 input {
+      width: 100%;
+      font-size: 17px;
+      padding: 15px;
+      outline: 0;
+      border: 1px solid #b3b3b3;
+      border-radius: 5px;
+  }
+
+  .options1 {
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: scroll;
+      padding: 0;
+  }
+
+  /* .options1::-webkit-scrollbar{
+      width: 5px;
+     
+    } */
+  .options1 li {
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      border-bottom: 1px solid gray;
+  }
+
+  .select-box1.active .content1 {
+      display: block;
+  }
+
+  .select-box1.active .select-option1:after {
+      transform: rotate(-180deg);
+  }
+  ::-webkit-calendar-picker-indicator {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 24 24"><path fill="%23bbbbbb" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+}
+</style>
+
+<div class="body-wrapper">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+        <li class="breadcrumb-item"><a class="text-warning-emphasis" >Cash & Bank</a></li>
+        <li class="breadcrumb-item" aria-current="page"><a href="{% url 'cash_in_hand_listout' %}" class="text-warning-emphasis" >Cash In Hand</a></li>
+        <li class="breadcrumb-item" aria-current="page">Add</li>
+      </ol>
+    </nav>
+      <div class="row mt-5">
+          <div class="col-md-12">
+            <div class="card mb-5 px-3 py-4" style="background-color: black; border-radius: 1vh;">
+              <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">CASH ADJUST</h1><br>
+              <hr class="text-warning">
+              <form action="{% url 'cash_in_hand_adjust_cash' %}" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-2 mt-3">
+                        <label class="labels" for="">Adjustment:</label>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <select class="form-control text-light" style="background-color: black;" name="adjust" id="adjust_id">
+                            <option selected value="add">ADD CASH</option>
+                            <option  value="reduce">REDUCE CASH</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mt-3">
+                        <label class="labels" for="">Amount:</label>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <input class="form-control text-light" style="background-color: black;" name="amount" type="number" required>
+                    </div>
+                    <div class="col-md-2 mt-3">
+                        <label class="labels" for="">Adjustment Date:</label>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <input class="form-control text-light" style="background-color: rgb(28, 28, 28);" name="date" type="date" required>
+                    </div>
+                    <div class="col-md-2 mt-3">
+                        <label class="labels" for="">Description:</label>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <input class="form-control text-light" style="background-color: black;" name="desc" type="text" >
+                    </div>
+                </div>
+                
+
+                <br>
+                <div class="mt-4">
+                  <!-- <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
+                      <label for="agreeTerms">Agree to terms and conditions</label>
+                      <div class="invalid-feedback">You must agree before submitting.</div>
+                  </div> -->
+                </div>
+                <div class="mt-4">
+                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" name="Saved" id="save">
+                  <!-- <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="Draft" id="draft"> -->
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'cash_in_hand_listout' %}`" value="CANCEL" id="cancel">
+                </div>
+              </form>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+{%endblock%}

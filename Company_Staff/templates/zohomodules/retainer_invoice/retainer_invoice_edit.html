@@ -1,0 +1,984 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-ez8n5b/9F3JpKCEY6zIp+Hg7IbU8d7Q5ST78iEiRaP2mNPjkDps8I+1i0fblDOoh" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-xxxxxx" crossorigin="anonymous" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+                                    /* form style */
+
+
+*{
+    color: aliceblue;
+    
+}
+input {
+    color: white;
+}
+</style>
+<style>         /* SEARCH STYLE */
+  /* Style the Select2 search input */
+  .select2-search__field {
+    width: 100%; /* Set the width as needed */
+    padding: 8px; /* Adjust padding as needed */
+    border: 1px solid #92acc6; /* Add border color */
+    border-radius: 4px; /* Add border-radius for rounded corners */
+    outline: none; /* Remove the outline */
+    color: #000;
+  }
+/*   
+  .select2-container .select2-selection--single{box-sizing:border-box;cursor:pointer;display:block;height:35px;user-select:none;color: black;
+    -webkit-user-select:none;background-color: #fff;} */
+.select2-container .select2-selection--single .select2-selection__rendered{border: 1px solid white; border-radius: 6px; display:block;padding-left:20px;padding-right:20px; height: 35px;color: rgb(252, 252, 252);background-color: #000000;border-radius: 2px;box-shadow: #fcfcfc;border-color: #f2e8e8;}
+    .select2-dropdown{background-color:rgb(0, 0, 0);color: rgb(253, 253, 253);position:absolute;left:-100000px;width:100%;z-index:1051;color: rgb(255, 255, 255);border-color: #f2e8e8;}
+    .select2-results{display:block;border: #ced4da;border-color: #f2e8e8;}
+    .select2-results__options{list-style:none;margin:0;padding:0;color: rgb(255, 255, 255);background-color: #030303;padding-left: 20px;border-color: #f2e8e8;} 
+    .select2-results__option[aria-selected]{cursor:pointer;color: rgb(251, 251, 251);background-color: #0c0c0c;border-color: #f2e8e8;}
+    .select2-container--open .select2-dropdown{left:0;color: rgb(255, 255, 255);background-color: #000000;border-color: #f2e8e8;}
+
+    .select2-hidden-accessible{background-color: #000000;border:2px !important;clip:rect(0 0 0 0) !important;-webkit-clip-path:inset(50%) !important;clip-path:inset(50%) !important;height:0px !important;padding:0 !important;position:absolute !important;width:1px !important;white-space:nowrap !important;color: rgb(250, 250, 250)} 
+    /* .select2-container--default .select2-selection--single{background-color:#000000;border:1px solid #000000;border-radius:4px;color: rgb(0, 0, 0);background-color: #ede4e4;} */
+/* .select2-hidden-accessible{background-color: #fff;border:0 !important;clip:rect(0 0 0 0) !important;-webkit-clip-path:inset(50%) !important;clip-path:inset(50%) !important;height:1px !important;overflow:hidden !important;padding:0 !important;position:absolute !important;width:1px !important;white-space:nowrap !important;color: black}  */
+.select2-container--default .select2-selection--single:focus, .select2-container--default .select2-selection--single .select2-search__field:focus, .typeahead:focus, .tt-query:focus, .tt-hint:focus {
+    border: 1px solid rgba(250, 250, 250, 0.5);
+    background-color: #d3bcbc;
+}
+</style>
+<style> /* MODAL STYLE */
+  .modal {
+ z-index: 9999;
+ overflow: scroll;
+}
+
+.modal-content {
+ background-color: #fefefe;
+ margin: 15% auto;
+ padding: 20px;
+ border: 1px solid #888;
+ width: 80%;
+}
+
+</style>
+<style>   /* ACCOUNT STYLE */
+  /*.modal {
+    z-index: 9999;
+    overflow: scroll;
+  }*/
+li{
+  color: #000;
+}
+  a {
+      color: rgb(0, 0, 0);
+  }
+
+  a:hover {
+      color: rgb(214, 141, 5);
+  }
+
+  tr:hover {
+      background-color: #92929242;
+      font-weight: bold;
+  }
+
+  /* width */
+  /*::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  /*::-webkit-scrollbar-track {
+    background: rgb(252, 236, 217);
+
+  }
+
+  /* Handle */
+  /*::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  /*::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }*/
+
+  /*#selected-area {
+    font-size: 20px;
+  }
+
+
+
+  /* .......................................... search box1.............. */
+  .select-box1 {
+      position: relative;
+      width: 100%;
+  }
+  
+
+  .select-option1 {
+      position: relative;
+      
+  }
+
+  .select-option1 input {
+      width: 100%;
+      cursor: pointer;
+      background-color: white;
+      color: black;
+      border-radius: 7px;
+      padding: 10px 15px;
+      border: 0 !important;
+      outline: 0 !important;
+  }
+
+  .select-option1:after {
+      content: "";
+      border-top: 12px solid #000;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -8px;
+
+  }
+
+  .content1 {
+      background-color: white;
+      position: absolute;
+      color: black;
+      border-radius: 7px;
+      margin-top: 15px;
+      width: 100%;
+      z-index: 999;
+      padding: 20px;
+      display: none;
+  }
+
+  .search1 input {
+      width: 100%;
+      font-size: 17px;
+      padding: 15px;
+      outline: 0;
+      border: 1px solid #b3b3b3;
+      border-radius: 5px;
+  }
+
+  .options1 {
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: scroll;
+      padding: 0;
+  }
+
+  /* .options1::-webkit-scrollbar{
+      width: 5px;
+     
+    } */
+  .options1 li {
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      border-bottom: 1px solid gray;
+  }
+
+  .select-box1.active .content1 {
+      display: block;
+  }
+
+  .select-box1.active .select-option1:after {
+      transform: rotate(-180deg);
+  }
+
+/* Add this CSS to your stylesheet or in the <style> tag in your HTML file */
+  .table {
+    border: 1px solid white; /* Add border */
+    border-collapse: collapse; /* Collapse borders */
+}
+
+.outline-border {
+    border: 2px solid white; /* Add border */
+}
+
+
+
+  
+</style>
+
+
+
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'items_list' %}" class="text-warning-emphasis">Retainer Invoice</a></li>
+              <li class="breadcrumb-item" aria-current="page" style="color:rgb(150, 128, 7);">Retainer Invoice</li>
+              <li class="breadcrumb-item" aria-current="page" style="color: white;">Edit</li>
+            </ol>
+        </nav>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1400px;">
+                
+               <br>
+               <!-- <div style="background-color: rgb(0, 0, 0); border-radius: 10px; width:80% ;margin-left: 18%;"> -->
+                <div >
+                  <h4 id="selected_customer_heading" class="text" style="color: white; margin-left: 2%; padding-top: 20px;"><b>EDIT RETAINER INVOICE</b></h4>
+                </div>
+             <br>
+            <div class="container-fluid"> 
+              {% for m in messages %}
+              <p style="color: chocolate;">{{m}}</p>
+              {% endfor %}
+      
+              <form action="" id="home" method="post" enctype="multipart/form-data" style="padding-left: 20px;">
+                {% csrf_token%}
+                <br>  
+                <h3 class="mb-3 text-white mt-4" style="font-size: 2rem;"></h3>
+                <br>
+                <fieldset class="form-group" >
+                    <div class="row">
+                      <hr>
+                          <div class="col-sm-3">
+                            <label class="">Customer Name *</label>
+                          </div>
+                          <div class="col-md-6 d-flex">
+                            <select class="form-control" id="customer_name" name="customer_name" onchange="getCustomerDetails(this.value)">
+                              <option value="{{ customer_name }}" selected>{{ customer_name }}</option>
+                              {% for customer in customers %}
+                                  <option class="text-light bg-black" value="{{ customer.id }}">{{ customer.customer_display_name }}</option>
+                              {% endfor %}
+                          </select>
+                          <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#newcustomer" >+</a>
+                          </div>
+                    </div>
+                </fieldset>
+                <br>
+                <div class="form-group row" id="cemail_row">
+                  <div class="col-sm-3 ">
+                    <label for="">Customer Mail</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="email" id="cx_mail" name="cx_mail" class="form-control"
+               style="background-color: black; color: white; border-radius: 5px;"
+               value="{{ customer_email }}">
+                  </div>
+                  <input type="text" style="width: 30%;display: none;" id="customer_id" name="customer_id" readonly>  
+                </div>
+                  <br>
+                 
+                  <div class="form-group row" id="address_row" style="display: none;">
+                    <div class="col-md-3"><label for="" style="color: aliceblue;">Billing Address</label></div>
+                    <div class="col-md-6">
+                        <textarea id="customer_address" cols="30" class="form-control"
+                        style="height: auto; background-color: black; color: white;"></textarea>
+                    </div>
+                </div>
+                
+                <br>
+                <div class="form-group row" id="cgst_treat_row">
+                  <div class="col-md-3"><label for=""  style="color: aliceblue;">GST Treatment</label></div>
+                  <div class="col-md-6"><input type="text" id="customer_gst_treat" class="form-control text-light"
+                    value="{{ gst_treatment }}" readonly style="color: aliceblue;">
+                  </div>
+                </div>
+                <br>
+                <div class="form-group row" id="cgstno_row">
+                  <div class="col-md-3"><label for="">GST Number</label></div>
+                  <div class="col-md-6"><input type="text" id="customer_gstno" class="form-control text-light"
+                    value="{{ gst_number }}" readonly>
+                  </div>
+                </div>
+                <br>
+                <div class="form-group row" id="cplace_supply_row">
+                  <div class="col-md-3"><label for="">Place Of Supply</label></div>
+                  <div class="col-md-6">
+                    <select class="form-control" id="cus_place1" name="cus_place1" onclick="place_of_supply()"
+                style="background-color: black; color: white;">
+                <option value="[AN]-Andaman and Nicobar Islands" {% if place_of_supply == "[AN]-Andaman and Nicobar Islands" %} selected {% endif %}>[AN] Andaman and Nicobar Islands</option>
+                      <option value="[AD]-Andhra Predhesh" {% if place_of_supply == "[AD]-Andhra Predhesh" %} selected {% endif %}>[AD] Andhra Predhesh</option>
+                      <option value="[AR]-Arunachal Predesh" {% if place_of_supply == "[AR]-Arunachal Predesh" %} selected {% endif %}>[AR] Arunachal Predesh</option>
+                      <option value="[AS]-Assam" {% if place_of_supply == "[AS]-Assam" %} selected {% endif %}>[AS] Assam</option>
+                      <option value="[BR]-Bihar" {% if place_of_supply == "[BR]-Bihar" %} selected {% endif %}>[BR] Bihar</option>
+                      <option value="[CH]-Chandigarh" {% if place_of_supply == "[CH]-Chandigarh" %} selected {% endif %}>[CH] Chandigarh</option>
+                      <option value="[CG]-Chhattisgarh" {% if place_of_supply == "[CG]-Chhattisgarh" %} selected {% endif %}>[CG] Chhattisgarh</option>
+                      <option value="[DNH]-Dadra and Nagar Haveli" {% if place_of_supply == "[DNH]-Dadra and Nagar Haveli" %} selected {% endif %}>[DNH] Dadra and Nagar Haveli</option>
+                      <option value="[DD]-Damn anad Diu" {% if place_of_supply == "[DD]-Damn anad Diu" %} selected {% endif %}>[DD] Damn anad Diu</option>
+                      <option value="[DL]-Delhi" {% if place_of_supply == "[DL]-Delhi" %} selected {% endif %}>[DL] Delhi</option>
+                      <option value="[GA]-Goa"  {% if place_of_supply == "[GA]-Goa" %} selected {% endif %}>[GA] Goa</option>
+                      <option value="[GJ]-Gujarat" {% if place_of_supply == "[GJ]-Gujarat" %} selected {% endif %}>[GJ] Gujarat</option>
+                      <option value="[HR]-Haryana" {% if place_of_supply == "[HR]-Haryana" %} selected {% endif %}>[HR] Haryana</option>
+                      <option value="[HP]-Himachal Predesh" {% if place_of_supply == "[HP]-Himachal Predesh" %} selected {% endif %}>[HP] Himachal Predesh</option>
+                      <option value="[JK]-Jammu and Kashmir" {% if place_of_supply == "[JK]-Jammu and Kashmir" %} selected {% endif %}>[JK] Jammu and Kashmir</option>
+                      <option value="[JH]-Jharkhand" {% if place_of_supply == "[JH]-Jharkhand" %} selected {% endif %}>[JH] Jharkhand</option>
+                      <option value="[KA]-Karnataka" {% if place_of_supply == "[KA]-Karnataka" %} selected {% endif %}>[KA] Karnataka</option>
+                      <option value="[KL]-Kerala"  {% if place_of_supply == "[KL]-Kerala" %} selected {% endif %}>[KL] Kerala</option>
+                      <option value="[LA]-Ladakh"  {% if place_of_supply == "[LA]-Ladakh" %} selected {% endif %}>[LA] Ladakh</option>
+                      <option value="[LD]-Lakshadweep" {% if place_of_supply == "[LD]-Lakshadweep" %} selected {% endif %}>[LD] Lakshadweep</option>
+                      <option value="[MP]-Madhya Predesh" {% if place_of_supply == "[MP]-Madhya Predesh" %} selected {% endif %}>[MP] Madhya Predesh</option>
+                      <option value="[MH]-Maharashtra">[MH] Maharashtra</option>
+                      <option value="[MN]-Manipur">[MN] Manipur</option>
+                      <option value="[ML]-Meghalaya">[ML] Meghalaya</option>
+                      <option value="[MZ]-Mizoram">[MZ] Mizoram</option>
+                      <option value="[NL]-Nagaland">[NL] Nagaland</option>
+                      <option value="[OD]-Odisha">[OD] Odisha</option>
+                      <option value="[PY]-Puducherry">[PY] Puducherry</option>
+                      <option value="[PB]-Punjab">[PB] Punjab</option>
+                      <option value="[RJ]-Rajasthan">[RJ] Rajasthan</option>
+                      <option value="[SK]-Sikkim">[SK] Sikkim</option>
+                      <option value="[TN]-Tamil Nadu">[TN] Tamil Nadu</option>
+                      <option value="[TS]-Telangana">[TS] Telangana</option>
+                      <option value="[TR]-Tripura">[TR] Tripura</option>
+                      <option value="[UP]-Uttar Predesh">[UP] Uttar Predesh</option>
+                      <option value="[UK]-Uttarakhand">[UK] Uttarakhand</option>
+                      <option value="[WB]-West Bengal">[WB] West Bengal</option>
+                      <option value="[OT]-Other Territory">[OT] Other Territory</option>
+                    </select>
+
+                  </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                    <label class="col-md-3">Retainer Invoice Number*</label>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="retainer-invoice-number" id="prof_name"
+                        value="{{ retainer_invoice_number }}" required style="background-color: black; color: white;">
+                      <label id="order_label" style="display: none;"></label>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                  <label class="col-md-3">Reference</label>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="references" value="{{reford}}" readonly style="background-color: black; color: white;">
+                  </div>
+              </div>   
+              <br>
+              <div class="form-group row">
+                <label class="col-md-3">Retainer Invoice Date*</label>
+                <div class="col-md-6">
+                    <input type="date" class="form-control" name="invoicedate" id="dateField" required
+                    pattern="\d{4}-\d{2}-\d{2}" style="background-color: black; color: white;"
+                    value="{{ retainer_invoice_date }}">
+                </div>
+              </div> 
+              <br> 
+             <!-- Payment Method field -->
+<div class="form-group row">
+  <label class="col-md-3">Payment Method</label>
+  <div class="col-md-6">
+      <select  style="background-color: black; color: white;" class="form-control" id="pay_method" name="pay_method">
+          <option value="" hidden>Select Payment Method</option>
+          <option value="cash">Cash</option>
+          <option value="cheque">Cheque</option>
+          <option value="upi">UPI</option>
+          <!-- Iterate over bank names and add options -->
+          {% for bank in banks %}
+              <option value="{{ bank }}">{{ bank }}</option>
+          {% endfor %}
+      </select>
+  </div>
+</div>
+
+<!-- Cheque Number field -->
+<div class="form-group row" id="chequediv" style="display: none;">
+  <label  style="background-color: black; color: white;" class="col-md-3">Cheque Number</label>
+  <div  style="background-color: black; color: white;" class="col-md-6">
+      <input type="text" class="form-control" name="chq_no" id="cheque_id" value="{{ payment_details.cheque_no }}">
+  </div>
+</div>
+
+<!-- UPI ID field -->
+<div  style="background-color: black; color: white;" class="form-group row" id="upidiv" style="display: none;">
+  <label class="col-md-3">UPI ID</label>
+  <div class="col-md-6">
+      <input type="text" class="form-control" name="upi_id" id="upi_id" value="{{ payment_details.upi_id }}">
+  </div>
+</div>
+
+<!-- Bank Account Number field -->
+<div  style="background-color: black; color: white;"class="form-group row" id="bnkdiv" style="display: none;">
+  <label class="col-md-3">Bank Account Number</label>
+  <div class="col-md-6">
+      <input type="text" class="form-control" name="acc_no" id="bnk_id" value="{{ payment_details.acc_no }}">
+  </div>
+</div>
+              <br><br>    
+              
+              
+              <div class="row mt-2">
+                <div class="col-md-12 mt-3">
+        
+                  <table id="retainer-table" class="table table-bordered table-responsive"
+                    style="background-color: rgba(12, 11, 11, 0.8);">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th style="font-size: medium;">PRODUCT&nbsp;</th>
+                        
+                        <th style="font-size: medium;">HSN</th>
+                        <th style="font-size: medium;" class="text-right">QUANTITY</th>
+                        <th style="font-size: medium;" class="text-right">RATE</th>
+                        <th style="font-size: medium;" class="text-right">DESCRIPTION</th>
+                        <th style="font-size: medium;" class="text-right">AMOUNT</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-table">
+                        {% for item in retainer_items %}
+                      <tr class="item-row" id="row1">
+                        <td style="width:1px;" class="index-number">1</td>
+                        <td>
+                          <div style="display: flex; align-items: center;">
+                          <select class='form-control  text-white item_select itm' name='item[]'
+                            id='item1' onchange="itemfunction(this.id)" style="background-color: black; color: white;">
+                            <option value="" selected hidden>{{ item.itemname }} </option>
+                           
+                            {% for item in items %}
+                                <option class="text-light .name" value="{{ item.id }}">{{ item.item_name }}</option>
+                            {% endfor %}
+                            
+                          </select>
+                          <a href="#">
+                            <button type="button" class="btn btn-outline-warning ms-1" data-target="#newItem" data-toggle="modal">+</button>
+                        </a>
+                        </div>
+                        </td>
+                        
+                            <td><input type="number" name="hsn[]" id="hsn1"
+                              class="form-control text-white text-right hsn"
+                              style="width: 100px;" value="{{ item.hsn }}" onchange="calculateAmount(1)">
+                              
+                          </td>
+                        <td><input type="number" name="quantity[]" id="qty1"
+                            class="form-control text-white text-right qty"
+                            style="width: 100px;" value="{{ item.quantity }}" onchange="calculateAmount(1)">
+                            <p style="font-size: 0.7rem;">Available Qty: <span id="available_stock"></span></p>
+                        </td>
+                        <td><input type="number" class="rate form-control text-light "
+                            name="rate[]" value="{{ item.rate }}" style="width: 100px;" step="0.01"  id="rate1" onchange="calculateAmount(1)"
+                            readonly /></td>
+                            <td><input type="text" class="form-control   text-light "
+                              name="description[]"  style="width: 100px;"  id="description1" />{{ item.description }}</td>
+                        <td><input type="number"
+                            class="amount form-control  text-light " name="amount[]"
+                            style="width: 100px;" step="0.01" value="{{ item.amount }}"  id="amount1" readonly /></td>
+                        <td class="text-center" >
+                          <a href="#"
+                            class="delete-row btn btn-transparent  btn-sm rounded-circle text-danger"
+                            style="width: 30px;"><i class="fa fa-trash text-danger"></i></a><br>
+                          
+                        </td>
+                      </tr>
+                      
+                      {% endfor %}
+                    </tbody>
+                    <tfoot>
+                      <tr class="blank-row">
+                          <td colspan="8">
+                              <button type="button" class="btn btn-outline-warning text-warning-emphasis" style="background-color: black;" id="add-another-line">+</button>
+                          </td>
+                      </tr>
+                  </tfoot>
+                  </table>
+        
+                  <br>
+                 
+        
+                  <input type="hidden" id="hidden-total-amount" name="total" value="">
+        
+        
+                </div>
+                <div class="col-md-2"></div>
+                <br><br>
+
+      <div class="row   pb-5">
+        
+          
+        <textarea cols="8" rows="13" name="customer_notes" id="floatingTextarea" style="background-color: #000;width:450px;height:200px;" placeholder="Note">{{ customer_notes }}</textarea>
+
+
+       
+        <div class="col-sm-6 mt-1">
+          <table class="table  text-white  outline-border" style="background-color: rgba(0, 0, 0, 0.8);margin-left:65px;">
+            <tr>
+                <td>Sub Total:</td>
+                <td></td>
+                <td><input type="number" name="subtotal"  id="subtotal"
+                    class="form-control " style="text-align: right; width:180px;"
+                    value="{{ subtotal }}"></td>
+              </tr>
+              <tr>
+                <td>Adjustment:</td>
+                <td></td>
+                <td><input type="number"  name="adjustment" id="adjustment" class="form-control" style="text-align: right; width:180px;" onchange="updateTotals()"></td>
+            </tr>
+
+              <td>Total:</td>
+              <td></td>
+              <td><input type="number" name="total" id="total-amount"
+                  class="form-control " style="text-align: right; width:180px;"
+                  readonly></td>
+            </tr>
+            <tr>
+              <td>Paid:</td>
+              <td></td>
+              <td><input type="number" name="paid" id="paid"
+                  class="form-control " onchange="show_bal()"
+                  style="text-align: right; width:180px;" value="0">
+                <label for="" id="pay-warning" style="display: none;text-align: right;" class="text-warning"></label>
+              </td>
+            </tr>
+            <tr>
+              <td>Balance:</td>
+              <td></td>
+              <td><input type="number" name="balance" id="balance"
+                  class="form-control " style="text-align: right; width:180px;"
+                  value="0" readonly></td>
+            </tr>
+          </table>
+            
+
+
+
+
+        </div>
+      </div>
+
+
+      <div class="row ">
+        <div class="col-md-8 d-flex flex-column text-white mb-2"  style="margin-top: -195px; margin-left:-10px;">
+          <input type="file" class="form-control" name="file" style="width:450px;"  >
+          <br>
+          <textarea  style="background-color: #000; width: 450px;" cols="20" rows="7" name="terms" id="floatingTextarea" placeholder="Terms & Conditions">{{ terms_conditions }}</textarea>
+        </div>
+      </div>
+
+
+      <div class="submit row mt-5 mb-3">
+        
+        <button class="btn mt-2" style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit"
+        name="action" value="Save">Save</button>
+        
+      </div>
+              </div>
+            </form>
+            </div>
+            </div>
+            </div>
+      </div>
+      <div class="form-inline " style="margin-bottom: 200px;"></div>                
+      <div class="form-inline " style="margin-bottom: 200px;"></div>
+      
+      
+      </div>
+              </div>
+              <script>
+               function getCustomerDetails(customerId) {
+    $.ajax({
+        url: "{% url 'get_customer_details' %}",
+        type: "POST",
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            customer_id: customerId
+        },
+        dataType: "json",
+        success: function(response) {
+            $('#cx_mail').val(response.customer_email);
+            $('#customer_gst_treat').val(response.gst_treatment);
+            $('#customer_gstno').val(response.gstin);
+            $('#cus_place1').val(response.place_of_supply);
+
+            // Check if Billing Address exists in the response
+            if (response.customer_address) {
+                $('#address_row').show();  // Show the Billing Address row
+                $('#customer_address').val(response.customer_address);
+            } else {
+                $('#address_row').hide();  // Hide the Billing Address row
+            }
+
+            $('#customer_id').val(customerId);
+            // Update other fields as needed
+        },
+        error: function(xhr, errmsg, err) {
+            console.log(xhr.status + ": " + xhr.responseText);
+            // Handle error if necessary
+        }
+    });
+}
+
+
+                </script>
+                <script>  document.getElementById('dateField').valueAsDate = new Date();</script>
+          
+                <script>
+                  function itemfunction(id_str) {
+                        console.log("itemfunction called"); // Add this line for debugging
+                        var id = id_str.split("item")[1];
+                        var select = $(`#item${id}`).val();
+                        console.log("Selected item ID: " + select);
+
+                        $.ajax({
+                            type: "GET",
+                            url: "{% url 'itemdata_ri' %}",
+                            data: { id: select },
+                            success: function(response) {
+                                console.log(response);
+                                var rate = response.rate;
+                                console.log("Retrieved rate: " + rate);
+                                var hsn = response.hsn;
+                                console.log("Retrieved hsn: " + hsn);
+                                // Update rate field
+                                $("#rate" + id).val(rate);
+                                $("#hsn" + id).val(hsn);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error fetching rate:", error);
+                            }
+                        });
+                    }
+
+                
+                </script>
+          
+          <script>
+            // Counter variable to track the number of item rows
+            var itemCounter = {{ retainer_items|length }};
+            // Function to update index numbers for item rows
+            function updateIndexNumbers() {
+                $(".item-row").each(function (index) {
+                    $(this).find(".index-number").text(index + 1);
+                });
+            }
+          $(document).on("click", ".delete-row", function () {
+                $(this).closest(".item-row").remove();
+                updateIndexNumbers(); // Update index numbers after deleting a row
+            });
+
+            // Function to add a new line with a unique index number
+            $("#add-another-line").click(function () {
+                itemCounter++;
+                var newRow =`
+                <tr class="item-row" id="row${itemCounter}">
+                <td class="index-number"style="width: 4px;">${itemCounter}</td>
+          
+                <td>
+                  <div style="display: flex; align-items: center;">
+                 <select class='form-control text-white item_select itm' name='item[]' id="item${itemCounter}" onchange="itemfunction(this.id)" style="background-color: black; color: white;">
+              <option value="" selected hidden>select item</option>
+              {% for item in items %}
+              <option class="text-light .name" value="{{ item.id }}">{{ item.item_name }}</option>
+              {% endfor %}
+            </select>
+                  <a href="#">
+                            <button type="button" class="btn btn-outline-warning ms-1" data-target="#newItem" data-toggle="modal">+</button>
+                        </a>
+                      </div>
+                </td>
+                
+                <td><input type="text" class="form-control" name="hsn[]" style="width: 100px;" required id="hsn${itemCounter}" /></td> <!-- Add HSN input field -->
+                <td><input type="number" name="quantity[]" id="qty${itemCounter}" class="form-control qty" style="width: 100px;" onchange="calculateAmount(${itemCounter})"></td>
+                <td><input type="number" class="rate form-control" name="rate[]" style="width: 100px;" step="0.01" required id="rate${itemCounter}" onchange="calculateAmount(${itemCounter})" readonly /></td>
+                <td><input type="text" class="form-control" name="description[]" style="width: 100px;"  id="description${itemCounter}" /></td>
+                <td><input type="number" class="amount form-control" name="amount[]" style="width: 100px;" step="0.01" required id="amount${itemCounter}" readonly /></td>
+                <td class="text-center" style="display: grid;">
+                  <a href="#"
+                    class="delete-row btn btn-transparent  btn-sm  text-danger"
+                    style="width: 30px;"><i class="fa fa-trash text-danger"></i></a><br>
+                  
+                </td></tr>`
+                ;
+                
+                $(newRow).insertBefore(".blank-row:first");
+                updateIndexNumbers(); 
+            });
+
+
+            
+            updateIndexNumbers();
+            // Call the function to update index numbers initially
+            //updateIndexNumbers();
+            function calculateAmount(rowId) {
+                var quantity = parseFloat(document.getElementById('qty' + rowId).value);
+                var rate = parseFloat(document.getElementById('rate' + rowId).value);
+                var amount = quantity * rate;
+
+                document.getElementById('amount' + rowId).value = amount.toFixed(2);
+              }
+
+
+  // Add event listeners to the quantity and rate inputs
+  var quantityInputs = document.querySelectorAll('[id^="qty"]');
+  var rateInputs = document.querySelectorAll('[id^="rate"]');
+
+  for (var i = 0; i < quantityInputs.length; i++) {
+    quantityInputs[i].addEventListener('input', handleInput);
+    rateInputs[i].addEventListener('input', handleInput);
+  }
+
+  function handleInput(event) {
+    var rowId = event.target.id.slice(-1);
+    calculateAmount(rowId);
+    calculateTotalAmount();
+  }
+
+  function calculateTotalAmount() {
+    var total = 0;
+
+    $('.amount').each(function () {
+      var amount = parseFloat($(this).val());
+      if (!isNaN(amount)) {
+        total += amount;
+        console.log(total);
+      }
+    });
+
+    document.getElementById('total-amount').value = total.toFixed(2);
+    $('#balance').val(total.toFixed(2));
+
+  }
+
+
+  $(document).ready(function () {
+    // Add event listeners to the 'Paid Off' and 'Total Amount' fields
+    $('#paid').on('input', show_bal);
+    $('#total-amount').on('input', show_bal);
+
+    // Function to calculate and display the balance
+    function show_bal() {
+      var paid_off = parseFloat($('#paid').val());
+      var total_amount = parseFloat($('#total-amount').val());
+      var bal = total_amount - paid_off;
+
+      // Ensure balance is shown as a positive number
+      if (bal < 0) {
+        bal = 0;
+        document.getElementById('pay-warning').style.display = ""
+        $('#pay-warning').text("Paid amount cannot be greater than the total*.");
+      }
+      else {
+        document.getElementById('pay-warning').style.display = "none"
+
+      }
+
+      $('#balance').val(bal.toFixed(2));
+    }
+
+    // Call the show_bal() function initially to display the initial balance
+    show_bal();
+  });
+
+// Function to calculate amount
+function calculateAmount(rowId) {
+        var quantity = parseFloat($("#qty" + rowId).val()) || 0;
+        var rate = parseFloat($("#rate" + rowId).val()) || 0;
+        var amount = quantity * rate;
+
+        $("#amount" + rowId).val(amount.toFixed(2));
+    }
+
+
+ // Function to calculate subtotal
+ function calculateSubtotal() {
+    var subtotal = 0;
+    $('.amount').each(function () {
+        var amount = parseFloat($(this).val());
+        if (!isNaN(amount)) {
+            subtotal += amount;
+        }
+    });
+    return subtotal;
+}
+
+// Function to update subtotal, total, and balance
+function updateTotals() {
+    var subtotal = calculateSubtotal();
+    var adjustment = parseFloat($('#adjustment').val()) || 0;
+    var total = subtotal + adjustment;
+
+    $('#subtotal').val(subtotal.toFixed(2));
+    $('#total-amount').val(total.toFixed(2));
+
+    calculateBalance(total);
+}
+
+// Function to calculate balance
+function calculateBalance(total) {
+    var paid = parseFloat($('#paid').val()) || 0;
+    var balance = total - paid;
+
+    if (balance < 0) {
+        $('#pay-warning').text("Paid amount cannot be greater than the total.");
+        $('#pay-warning').show();
+    } else {
+        $('#pay-warning').hide();
+    }
+
+    $('#balance').val(balance.toFixed(2));
+}
+
+// Function to handle input changes
+function handleInput(event) {
+    updateTotals();
+}
+
+
+          </script>
+          
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+          <script type="text/javascript">
+            $(document).ready(function() {
+              $('#pay_method').change(function() {
+                var selectedOption = $(this).val();
+                if (selectedOption === 'cheque') {
+                  $('#chequediv').show();
+                  $('#upidiv').hide();
+                  $('#bnkdiv').hide();
+                } else if (selectedOption === 'upi') {
+                  $('#chequediv').hide();
+                  $('#upidiv').show();
+                  $('#bnkdiv').hide();
+                } else if (selectedOption === 'cash') {
+                  $('#chequediv').hide();
+                  $('#upidiv').hide();
+                  $('#bnkdiv').hide();
+                } else {
+                  $('#chequediv').hide();
+                  $('#upidiv').hide();
+                  $('#bnkdiv').show();
+                  var selectedBank = $("#pay_method option:selected").text();
+                  $.ajax({
+                    url: "{% url 'get_bank_details' %}",
+                    type: 'GET',
+                    data: {
+                      'bank_name': selectedBank
+                    },
+                    success: function(data) {
+                      $('#bnk_id').val(data.bnk_acno);
+                    }
+                  });
+                }
+              });
+            });
+            function savedraft() {
+
+              var frm = document.getElementById("home");
+
+              // let customMsg = "Do you want to save as draft?";
+
+              // if (confirm(customMsg)) {
+
+              frm.action = ("{% url 'create_invoice_draft' %}")
+              // } else {
+              //   console.log("User Clicked CANCEL");
+              // }
+              }
+            function savesend() {
+              var frm = document.getElementById("home");
+              frm.action = ("{% url 'create_invoice_send' %}")
+
+            }
+
+
+            
+  $('#retainer-table').on('click', '.delete-row', function () {
+    event.preventDefault();
+    $(this).closest('tr').remove();
+    calculateTotalAmount();
+  });
+  
+    $(document).ready(function () {
+        // Function to update related fields when a different customer is selected
+        $("#customer_name").change(function () {
+            var customerId = $(this).val();
+            $.ajax({
+                url: "{% url 'get_customer_details' %}",
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    customer_id: customerId
+                },
+                dataType: "json",
+                success: function(response) {
+                    // Update other fields with the received data
+                    $('#customer_email').val(response.customer_email);
+                    $('#billing_address').val(response.billing_address);
+                    $('#gst_treatment').val(response.gst_treatment);
+                    $('#gst_number').val(response.gst_number);
+                    $('#place_of_supply').val(response.place_of_supply);
+                    // Update other fields as needed
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                    // Handle error if necessary
+                }
+            });
+        });
+    });
+</script>
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Fetch and set initial payment method value
+        var initialPaymentMethod = "{{ payment_details.payment_opt }}";
+        $('#pay_method').val(initialPaymentMethod);
+
+        // Trigger change event initially to show/hide relevant sections
+        $('#pay_method').change();
+
+        $('#pay_method').change(function() {
+            var selectedOption = $(this).val();
+            if (selectedOption === 'cheque') {
+                $('#chequediv').show();
+                $('#upidiv').hide();
+                $('#bnkdiv').hide();
+            } else if (selectedOption === 'upi') {
+                $('#chequediv').hide();
+                $('#upidiv').show();
+                $('#bnkdiv').hide();
+            } else if (selectedOption === 'cash') {
+                $('#chequediv').hide();
+                $('#upidiv').hide();
+                $('#bnkdiv').hide();
+            } else {
+                $('#chequediv').hide();
+                $('#upidiv').hide();
+                $('#bnkdiv').show();
+                var selectedBank = $("#pay_method option:selected").text();
+                $.ajax({
+                    url: "{% url 'get_bank_details' %}",
+                    type: 'GET',
+                    data: {
+                        'bank_name': selectedBank
+                    },
+                    success: function(data) {
+                        $('#bnk_id').val(data.bnk_acno);
+                    }
+                });
+            }
+        });
+    });
+
+    
+</script>
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

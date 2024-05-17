@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-...your-integrity-code-here..." crossorigin="anonymous" />
+
+<!-- Include DataTables -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+<style>
+    .bg-dark {
+      --bs-bg-opacity: 0;
+      background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important;
+  }
+  .table-striped>tbody>tr:nth-of-type(odd)>* {
+      --bs-table-accent-bg: rgb(0, 0, 0);
+      color: var(--bs-table-striped-color);
+  }
+  a {
+    color: rgb(255, 251, 251); /* You can use any color you prefer */
+    text-decoration: none; /* Optional: Remove underline if you don't want it */
+  }
+  </style>
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'payment_listout' %}" class="text-warning-emphasis">Payment_Recieved</a></li>
+              <li class="breadcrumb-item" aria-current="page">Overview</li>
+            </ol>
+        </nav>
+        <div class="row mt-5">
+          <div class="col-md-12">
+              <div class="card mb-5 p-5" style="background-color: black; border-radius: 1vh;">
+                  <h1 style="color: white; font-weight: bolder;">PAYMENT RECIEVED</h1><br>
+                  {% for message in messages %}
+                  <h5>
+                    <div class="alert alert-danger message text-center" style="color: black;" id="alert_danger">
+                      {{ message }}
+                      <a type="button" id="alert_close" class="close" data-dismiss="alert" aria-label="Close" style="float: right;">
+                          <span aria-hidden="true" style="font-size: large; color: #68020F;">&times;</span>
+                      </a>
+                    </div>
+                  </h5>
+                  {% endfor %}
+               <div class="row container-fluid mb-3">
+                <div class="col-md-3">
+                    <input type="text" id="searchInput" onkeyup="searchTable()" class="form-control text-black" style="border-color: rgb(198, 134, 16);background-color: antiquewhite;" placeholder="Search...">
+                </div>
+                <div class="col-md-2">
+                    <div class="dropdown">
+                        <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" role="button" style="margin-left: 10px;">
+                            <i class="fas fa-sort m-1"></i>
+                        </a>
+                        <div class="dropdown-menu m-1" style="background-color: black; color: white;">
+                          <a class="dropdown-item" href="#" onclick="sortTable('all')" style="color: azure;">All</a>
+                          <a class="dropdown-item" href="#" onclick="sortTable('payment')" style="color: azure;">Payment Received Number</a>
+                          <a class="dropdown-item" href="#" onclick="sortTable('name')" style="color: azure;">Name</a>
+                        
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-3">
+                    <div class="d-flex justify-content-end">
+                        <div class="dropdown">
+                            <a class="btn text-center px-4 pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false" role="button">
+                                <i class="fa fa-filter mt-1"></i>
+                            </a>
+                            <div class="dropdown-menu m-1" style="background-color: black; color: white;">
+                              <!-- Modify the filter dropdown menu -->
+                              <a class="dropdown-item dropdown-item-filter" href="javascript:void(0);" style="background-color: black; color: white;" onclick="filterTable('All')"  >All</a>
+                              <a class="dropdown-item dropdown-item-filter" href="javascript:void(0);" style="background-color: black; color: white;" onclick="filterTable('Saved')">Saved</a>
+                              <a class="dropdown-item dropdown-item-filter" href="javascript:void(0);" style="background-color: black; color: white;" onclick="filterTable('Draft')">Draft</a>
+
+                            </div>
+                        </div>
+                     
+                        
+                        <!-- Add this JavaScript function after your HTML code -->
+                      
+              
+                        <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;  margin-left: 12px;" data-bs-toggle="modal" href="#importModal" class="btn btn-outline-warning">
+                          <i class="fa fa-file-excel p-0" style="font-size: large;"></i>
+                          <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Import</span>
+                      </a>
+                      <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;margin-left: 10px;" onclick="exportToExcel()" class="btn btn-outline-warning" >
+                        <i class="fa fa-file-excel-o p-1" style="font-size: large;" onclick="exportToExcel()"></i>
+                        <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+                    </a>
+        
+                        <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center; margin-left: 10px;" class="btn btn-outline-warning"  href="{% url 'new_payment' %}">
+                            NEW <i class="fa fa-plus" style="font-size: large;"></i>
+                            <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center"></span>
+                        </a>
+                    </div>
+                </div>
+         
+        
+        <div class="container-fluid" id="container-to-print" style="width: 100%;"> 
+            <section id="selected-area">
+          <div class="row pt-5">
+              <center>
+                <h2 class="text" style="color: white;">{{ company.company_name }}</h2>
+               
+        
+              </center>
+              <div class="table-responsive"> 
+                <table class="table table-bordered table-striped mt-4" id="data-table">
+                  <thead class="text-white">
+                    
+                      <tr style="background-color: rgb(0, 0, 0);border-color:rgba(0, 0, 0, 0.549) rgb(0, 0, 0) rgb(173, 166, 166) rgb(0, 0, 0);text-align: center;">
+                         <th style="color: rgb(247, 247, 247);">#</th>
+                          <th style="color: rgb(247, 247, 247);">Date</th>
+                          <th id="paymentNumberHeader" style="color: rgb(250, 247, 242);">Payment Recieved No</th>
+                          <th id="customerNameHeader" style="color: rgb(244, 244, 244);">Customer Name</th>
+                          <th style="color: rgb(255, 255, 255);">Customer Mail id</th>
+                          <th style="color: rgb(252, 252, 252);">Amount </th>
+                          <th style="color: rgb(237, 237, 236);">Status</th>
+                          <th style="color: rgb(247, 245, 240);">Balance</th>
+                          
+                          
+                      </tr>
+                  </thead>
+                <tbody style="background-color: black;">
+                  
+              {% for p in payment %}
+                <tr style="background-color: rgb(0, 0, 0);border-color:rgba(0, 0, 0, 0.549) rgb(0, 0, 0) rgb(173, 166, 166) rgb(0, 0, 0);text-align: center;" class='clickable-row' data-href="">             
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;">{{forloop.counter}}</td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url 'payment_view' pk=p.pk %}">{{ p.payment_date }}</td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url 'payment_view' pk=p.pk %}">{{ p.payment_number }}</a></td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url  'payment_view' pk=p.pk %}">{{ p.customer.first_name }} {{ p.customer.last_name }}</a></td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url  'payment_view' pk=p.pk %}">{{ p.customer_email }}</a></td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url  'payment_view' pk=p.pk %}">{{ p.amount_to_apply }}</a></td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url  'payment_view' pk=p.pk %}">{{ p.status }}</a></td>
+                  <td class="bg-dark text-white" style="color: rgb(0, 0, 0); background-color: black;"><a href="{% url  'payment_view' pk=p.pk   %}">{{ p.amount_to_credit }}</a></td>
+
+               
+              </tr>
+
+
+             {% endfor %}
+            
+              
+                </tbody>
+                                          
+                </table> 
+              {% comment %} <div id="total-bill-amount" class="mt-3" style="color: white;"></div> {% endcomment %}
+              <div>
+                  <div id="noDataMessage" style="display: none; color: white;">No data found for selected dates.</div>	
+                  <br><br><br><br><br>
+              </div>
+          </div>
+        </div>
+        </section>
+        
+        
+        </div>
+                </div>
+            </div>
+        </section>
+        </div>
+        </div>
+        </div>
+</div>
+<div class="modal fade" id="importModal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">Import</h3>
+        <button type="button" class="btn close text-white" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3 rounded-1" style="background-color: #000;">
+        <div class="file_instructions">
+          <div class="alert alert-danger" role="alert">
+            <span class="fw-bolder">IMPORTANT:</span>
+            <p>File should have 1 sheet named 'payment_received' with the following column names and order:</p>
+            <ul>
+              <li>SLNO</li>
+              <li>CUSTOMER</li>
+              <li>DATE</li>
+              <li>AMOUNT</li>
+              <li>STATUS</li>
+              <li>BALANCE</li>
+            </ul>
+            <p>All required columns should be filled.</p>
+            <p>Place of supply should be in the given format with state code ('Ex: [KL]-Kerala') or '[OT]-Other Territory'.</p>
+            <p>Date format should be 'YYYY-MM-DD'.</p>
+          </div>
+        </div>
+        <div class="sample_file mb-2">
+          <!-- Provide a link to download a sample file -->
+          <a href="{% url 'download_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
+        </div>
+        <form id="importPaymentReceivedForm" action="{% url 'importExcel_payment_received' %}" method="POST" class="form" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="excel_file" class="form-label text-white">File</label>
+            <input id="excel_file" class="form-control" type="file" name="excel_file" required>
+          </div>
+          <div class="d-flex justify-content-center mt-4">
+            <input id="submit_import_excel" value="IMPORT" class="btn btn-outline-warning" type="submit">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+  
+// Sorting function
+function sortTable(column) {
+  var table = $('#data-table').DataTable();
+  if (column === 'payment') {
+    // Sort by Payment Received Number in ascending order
+    table.order([1, 'asc']).draw();
+  } else if (column === 'name') {
+    // Sort by Customer Name in alphabetical order
+    table.order([2, 'asc']).draw();
+  }
+}
+
+</script>
+
+
+
+
+<!-- FILTER -->
+<script>
+  function filterTable(filterBy) {
+  // Get all table rows
+  const rows = document.getElementById("data-table").querySelectorAll("tbody tr");
+
+  // Loop through each row
+  for (const row of rows) {
+    // Get the status cell (assuming status is in the 6th column)
+    const statusCell = row.children[5];
+    const status = statusCell.textContent.trim();
+
+    // Show/hide row based on filter
+    if (filterBy === "All" || status === filterBy) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}
+</script>
+
+<!-- SORTING -->
+<script>
+  function sortTable(sortColumn) {
+  const tableBody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
+  const rows = Array.from(tableBody.querySelectorAll("tr")); // Convert to array for sorting
+
+  if (sortColumn === "all") {
+    // No sorting, return the original order
+    return rows;
+  } else {
+    // Sort based on the chosen column (name or payment)
+    return rows.sort((rowA, rowB) => {
+      const valueA = rowA.children[sortColumn === "name" ? 2 : 1].textContent.trim().toLowerCase();
+      const valueB = rowB.children[sortColumn === "name" ? 2 : 1].textContent.trim().toLowerCase();
+      return valueA.localeCompare(valueB);
+    });
+  }
+
+  // Update table body only after sorting for other options
+  if (sortColumn !== "all") {
+    tableBody.innerHTML = ""; // Clear existing rows
+    sortedRows.forEach(row => tableBody.appendChild(row));
+  }
+}
+</script>
+
+
+<!-- SEARCH -->
+<script>
+  function searchTable() {
+  const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
+  const tableBody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
+  const rows = tableBody.querySelectorAll("tr");
+
+  for (const row of rows) {
+    const allCells = Array.from(row.children);
+    let rowVisible = false;
+
+    for (const cell of allCells) {
+      const cellText = cell.textContent.trim().toLowerCase();
+      if (cellText.indexOf(searchTerm) !== -1) {
+        rowVisible = true;
+        break; // Exit loop if a match is found in any cell
+      }
+    }
+
+    row.style.display = rowVisible ? "" : "none";
+  }
+}
+</script>
+
+
+<!-- EXPORT -->
+<script src="xlsx.min.js"></script>
+<script>
+  function exportToExcel() {
+      const table = document.getElementById("data-table");
+      
+      // Create a new workbook
+      const workbook = XLSX.utils.book_new();
+      
+      // Create a worksheet from the table data
+      const worksheet = XLSX.utils.table_to_sheet(table);
+      
+      // Add the worksheet to the workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Payment Data");
+      
+      // Generate Excel file content as a Blob
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      
+      // Create a downloadable link
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "payment_Recieved.xlsx";
+      
+      // Append the link to the body and trigger the click to download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+  }
+  </script>
+  
+
+
+
+
+
+{% endblock %}

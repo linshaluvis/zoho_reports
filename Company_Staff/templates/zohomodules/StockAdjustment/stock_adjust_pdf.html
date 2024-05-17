@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinsYs</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        padding: 5px 2px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .stk_adj_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: left;
+    }
+</style>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis" style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <b>
+                            <p style="font-size: 1.3rem;">STOCK ADJUSTMENT</p>
+                        </b>
+                    </center>
+                </div>
+                <hr>
+                <div style="width: 100%;">
+                    <div class="stk_adj_data">
+                        <div class="data_row">
+                            <div class="data_1 data_value">Mode of Adjustment: {{stk_adj.mode}}</div>
+                        </div>
+                        <div class="data_row">
+                            <div class="data_1 data_value">Reference No.: {{stk_adj.ref_no}}</div>
+                        </div>
+                        <div class="data_row">
+                            <div class="data_1 data_value">Date: {{stk_adj.adj_date|date:'d-m-Y'}}</div>
+                        </div>
+                        <div class="data_row">
+                            <div class="data_1 data_value">Account: {{stk_adj.account}}</div>
+                        </div>
+                        <div class="data_row">
+                            <div class="data_1 data_value">Reason: {{stk_adj.reason}}</div>
+                        </div>
+                        {% if stk_adj.desc %}
+                        <div class="data_row">
+                            <div class="data_1 data_value">Description: {{stk_adj.desc}}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <section class="mt-4">
+                <table class="table2">
+                    <thead>
+                        {% if stk_adj.mode == 'Quantity' %}
+                        <tr>
+                            <th style="text-align: center; text-transform:uppercase;">Item Name</th>
+                            <th style="text-align: center; text-transform:uppercase;">Quantity Available</th>
+                            <th style="text-align: center; text-transform:uppercase;">New Quantity on Hand</th>
+                            <th style="text-align: center; text-transform:uppercase;">Quantity Adjusted</th>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <th style="text-align: center; text-transform:uppercase;">Item Name</th>
+                            <th style="text-align: center; text-transform:uppercase;">Current Value</th>
+                            <th style="text-align: center; text-transform:uppercase;">Changed Value</th>
+                            <th style="text-align: center; text-transform:uppercase;">Adjusted Value</th>
+                        </tr>
+                        {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for itm in stk_adj_itm %}
+                        <tr>
+                            <td style="text-align: center;">{{itm.item.item_name}}</td>
+                            <td style="text-align: center;">{{itm.current_val}}</td>
+                            <td style="text-align: center;">{{itm.changed_val}}</td>
+                            <td style="text-align: center;">{{itm.adjusted_val}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

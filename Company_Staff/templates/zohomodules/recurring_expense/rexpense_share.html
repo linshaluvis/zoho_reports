@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+   .tabletd {
+    border: 1px solid #dddddd;
+    padding: 5px 2px;
+    /* text-align: left; */
+    }
+
+    .tableth {
+    background-color: #f2f2f2;
+    }
+    td{
+      padding: 5px 2px;
+      border: 1px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    .balance_info{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+    .balance_info .bal_head{
+        width: 48%;
+    }
+
+    .bal_value{
+        width: 48%;
+        flex: 1;
+        text-align: right;
+    }
+
+
+
+
+
+</style>
+
+<body>
+ 
+        <div class="page"  size="A4" >
+            <div class="" id="printdiv3">
+                <div class="row">
+                    <div class="col-sm-12 py-3" style="background-image: linear-gradient(#ffae1f, black); color: black;">
+                        <p style="text-align: center;color: black;">RECURRING EXPENSE</p>
+                        <p style=" text-align: center;color: black;"> {{cmp.company_name}} <br>
+                            {{cmp.address}} <br>
+                            {{cmp.city}},
+                            {{cmp.state}}<br>
+                            {{cmp.login_details.email}}
+                            <br>
+                        </p>
+                    </div>
+                    <table class="table1 table-bordered" style="border-color: black;">
+                      <tbody>
+                          <tr style="font-weight: bolder;">
+                            <td></td>
+                              <td>Bill To</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style="width:50% ;"></td>
+
+                            
+                              <td >Deliver To</td>
+                          </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <h3 style="text-transform: capitalize; margin-left: 10%;" >{{ expense.vendor.first_name }} &nbsp;{{ expense.vendor.last_name }}</h3>
+                            <p class="text-black " style=" margin-left: 10%;"> 
+                             
+                              {{ expense.vendor.billing_address }} <br>
+                              {{ expense.vendor.billing_city }} <br>
+                              {{ expense.vendor.billing_state }},
+                              {{ expense.vendor.billing_country }} <br>
+                              {{ expense.vendor.billing_pin_code }}
+                            </p>
+                          </td>
+                       
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                            <td></td>
+                            <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style="width:50% ;"></td>
+
+                     <td style="margin-left:100% ;" >
+                         
+                            <h3  style="text-transform: capitalize;">{{ expense.customer.title }}. {{ expense.customer.first_name }} {{ expense.customer.last_name }}</h3>
+                            <p class="text-black" > 
+                              {{ expense.customer.billing_address }} <br>
+                                        {{ expense.customer.billing_city }} <br>
+                                        {{ expense.customer.billing_state }},
+                                        {{ expense.customer.billing_country }} <br>
+                                        {{ expense.customer.billing_pincode }}
+                            </p>
+                          </td>
+                          </tr>
+                          </tbody>
+                          </table>
+                          <hr><br>
+                        <!-- <div class="col-md-1"></div> -->
+                        <div class="col-7 py-3 px-3">
+                           <table>
+                                <tbody>
+                                    <tr style="border: transparent;" >
+                                        <td style="color: #000; font-weight: bold;border: transparent;white-space: nowrap;">Rec.Expense No</td>
+                                        <td style="color: #000;border: transparent;">:</td>
+                                        <td class="text-right" style="color: #000;border: transparent;">{{ expense.Expense_Number }}</td>
+                                    </tr>
+                                    
+                                    
+                                    <tr >
+                                        <td style="color: #000; font-weight: bold;border: transparent;"> Date</td>
+                                        <td style="color: #000;border: transparent;">:</td>
+                                        <td class="text-right" style="color: #000;border: transparent;">{{expense.exp_date | date:'d-m-Y'}}<td>
+                                    </tr>
+
+                                   
+
+                                    <tr>
+                                        <td style="color: #000; font-weight: bold;border: transparent;white-space: nowrap;">Payment Method</td>
+                                        <td style="color: #000;border: transparent;">:</td>
+                                        <td class="text-right" style="color: #000;border: transparent;">{{expense.Payment_Method}}</td>
+                                        
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <br>
+                    <div class="col-md-12 px-4">
+                        <table class="table table-hover table-bordered  template3table" id="table3">
+                          <thead class="bg-warning">
+                            <tr class="text-center text-black" style="font-weight: bold;">
+                      
+                              <th class="tableth">EXPENSE ACCOUNT</th>
+                              <th class="tableth">EXPENSE TYPE</th>
+                              {% if expense.expense_type == 'Goods' %}<th class="text-center text-black tableth" >HSN</th>{% else %}<th class="text-center text-black tableth" >SAC</th>{% endif %}
+                              <th class="tableth" >AMOUNT</th>
+                              
+                            </tr>
+                          </thead>
+                          <tbody>
+                        
+                            <tr class="text-black text-center">
+                             <td style="color:black; text-align: center;">{{expense.chart_of_accounts.account_name}}</td>
+                              <td style="color:black;text-align: center;"  class="tabletd">{{expense.expense_type}}</td>
+                              {% if expense.expense_type == 'Goods' %}<td class="text-center tabletd" style="color:black;text-align: center;">{{expense.hsn}}</td>{% else %}<td class="text-center tabletd " style="color:black;text-align: center;">{{expense.sac}}</td>{% endif %}
+                              
+                              <td style="color:black;text-align: center;"  class="tabletd">{{expense.amount}}</td>
+                              
+                            </tr>
+                            
+                          </tbody>
+                          </table>
+                    </div>
+                </div> 
+                 
+            </div>
+
+
+</html>
+
+

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZOHO</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+    th, td {
+    border: 1px solid #dddddd;
+    padding: 5px 2px;
+    /* text-align: left; */
+    }
+
+    th {
+    background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    .balance_info{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+    .balance_info .bal_head{
+        width: 48%;
+    }
+
+    .bal_value{
+        width: 48%;
+        flex: 1;
+        text-align: right;
+    }
+
+
+
+
+
+</style>
+
+<body>
+    <div class="my-5 page" >
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis" style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <b>
+                            <p style="font-size: 1.3rem;">UPI PAYMENTS</p>
+                        </b>
+
+                        <h3>{{ details.company_name }}</h3>
+                          {{ details.contact }} <br>
+                          {{ details.address }} <br>
+                          {{ details.city }} <br>
+                          {{ details.state|slice:'5:' }},
+                          {{ details.country }} <br>
+                          {{ details.pincode }}
+                        </p>
+
+                    </center>
+                </div>
+                <hr>
+ 
+            <div id="Overview" >
+                <div class="page" size="A4">
+                    <div class="p-4">
+                      <div id="ember2512" class="tooltip-container ember-view ribbon text-ellipsis">
+                        <section>
+                          <div class="text-center">
+                            <h2 class="text-white bg-warning p-3">UPI STATEMENT</h2>
+                          </div>
+                        </section>
+                        <br>
+                        <section class="store-user mt-2">
+                          <div class="col-12">
+                            <div class="row pb-3">
+                              <div class="col-7">
+                                <p><b class="text-black">COMPANY</b>,</p>
+                                <div style="margin-left: 20%;">
+                                  <h3>{{ details.company_name }}</h3>
+                                  <p class="text-black"> 
+                                    {{ details.contact }} <br>
+                                    {{ details.address }} <br>
+                                    {{ details.city }} <br>
+                                    {{ details.state|slice:'5:' }},
+                                    {{ details.country }} <br>
+                                    {{ details.pincode }}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="col-2"></div>
+                              <div class="col-11 d-flex justify-content-end">
+                                <div class="bal_section pr-3">
+                                  {% comment %} <span class="h4 font-weight-bold text-warning">TOTAL AMOUNT: <span id="bal">0</span></span> {% endcomment %}
+                                </div>
+                              </div>
+                            </div>
+                              </div>
+                        </section>
+                       
+
+                        <section class="table-responsive mt-4">
+                          <table class=" table table-hover table-bordered border-dark" id="statementtable">
+                            <thead class="bg-warning">
+                              <tr class="text-center text-white" style="font-weight: bold;">
+                                <!-- <th style="width: 5%;">#</th> -->
+                                <th >DATE</th>
+                                <th>TYPE</th>
+                                <th>NAME</th>
+                                <th>REF. NO.</th>
+                                <th >UPI NO.</th>
+                                <th>AMOUNT</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for a in invoice %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.date|date:'Y-m-d' }}</td>
+                                <td>INVOICE</td>
+                                <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+                                <td>{{a.reference_number}}</td>
+                                <td>{{a.UPI_number}}</td>
+                                <td>{{ a.advanced_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                              
+                              {% for a in recInvoice %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.start_date|date:'Y-m-d' }}</td>
+                                <td>RECURRING INVOICE</td>
+                                <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+                                <td>{{a.reference_no}}</td>
+                                <td>{{a.upi_number}}</td>
+                                <td>{{ a.advance_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in creditNote %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.credit_note_date|date:'Y-m-d' }}</td>
+                                <td>CREDIT NOTE</td>
+                                <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+                                <td>{{a.reference_number}}</td>
+                                <td>{{a.upi_number}}</td>
+                                <td>{{ a.advance_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in salesOrder %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.sales_order_date|date:'Y-m-d' }}</td>
+                                <td>SALES ORDER</td>
+                                <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+                                <td>{{a.reference_number}}</td>
+                                <td>{{a.upi_number}}</td>
+                                <td>{{ a.advanced_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in retainerInvoice %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.retainer.retainer_invoice_date|date:'Y-m-d' }}</td>
+                                <td>RETAINER INVOICE</td>
+                                <td>{{a.retainer.customer_name.first_name}} {{a.retainer.customer_name.last_name}}</td>
+                                <td>{{a.retainer.refrences}}</td>
+                                <td>{{a.upi_id}}</td>
+                                <td>{{ a.retainer.advance }}</td>
+                  
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in bill %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.Bill_Date|date:'Y-m-d' }}</td>
+                                <td>BILL</td>
+                                <td>{{a.Vendor.first_name}} {{a.Vendor.last_name}}</td>
+                                <td>{{a.Reference_Number}}</td>
+                                <td>{{a.UPI_Id}}</td>
+                                <td>{{ a.Advance_amount_Paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in recurringBill %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.rec_bill_date|date:'Y-m-d' }}</td>
+                                <td>RECURRING BILL</td>
+                                <td>{{a.vendor_details.first_name}} {{a.vendor_details.last_name}}</td>
+                                <td>{{a.recc_ref_no}}</td>
+                                <td>{{a.upi_id}}</td>
+                                <td>{{ a.paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in purchaseOrder %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.purchase_order_date|date:'Y-m-d' }}</td>
+                                <td>PURCHASE ORDER</td>
+                                <td>{{a.vendor.first_name}} {{a.Vendor.last_name}}</td>
+                                <td>{{a.reference_number}}</td>
+                                <td>{{a.upi_number}}</td>
+                                <td>{{ a.advanced_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                    
+                              {% for a in debitNote %}
+                              <tr style="border: 1px solid black; height: 40px; text-align: center;">
+                                <td>{{ a.debitnote_date|date:'Y-m-d' }}</td>
+                                <td>DEBIT NOTE</td>
+                                <td>{{a.vendor.first_name}} {{a.vendor.last_name}}</td>
+                                <td>{{a.reference_no}}</td>
+                                <td>{{a.upi_number}}</td>
+                                <td>{{ a.advance_paid }}</td>
+                              </tr>
+                              {% endfor %}
+                           
+                          </tbody>
+                          </table><br><br>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+
+    
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function(){
+        var date1 = "";
+        $('#startDate').on('change',function(){
+            date1 = $(this).val()
+            $('#endDate').prop('min',date1)
+        })
+    })
+    $(document).ready(function(){
+        var date2 = "";
+        $('#endDate').on('change',function(){
+            date2 = $(this).val()
+            $('#startDate').prop('max',date2)
+        })
+    })
+  
+    $(document).ready(function(){
+      $('#share_with_email').on('click',function(){
+          var emailsInput = document.getElementById('emailIds');
+          var emailsString = emailsInput.value.trim();
+  
+          var emails = emailsString.split(',').map(function(email) {
+              return email.trim();
+          });
+  
+          var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  
+          var invalidEmails = []
+          if(emailsString == ""){
+              alert('Enter valid email addresses..')
+          }
+          else{
+              for (var i = 0; i < emails.length; i++) {
+                  var currentEmail = emails[i];
+  
+                  if (currentEmail!="" && !emailRegex.test(currentEmail)) {
+                      console.log(currentEmail + ' is invalid!');
+                      invalidEmails.push(currentEmail)
+                  }
+              }
+              
+              if(invalidEmails.length > 0){
+                  alert('Invalid emails..Please check!\n'+invalidEmails)
+                  // alert(invalidEmails)
+              }else{
+                  $('#share_to_email_form').submit();
+              }
+          }
+      })
+    });
+  
+    $(document).ready(function(){
+      calculateBalance();
+    });
+    
+    function calculateBalance(){
+      var table = document.getElementById('chequesTable');
+      var rows = table.getElementsByTagName('tr');
+      var balance = 0
+  
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if(row.style.display != 'none'){
+          var amt = parseFloat(row.getElementsByTagName('td')[5].textContent);
+          var type = row.getElementsByTagName('td')[1].textContent;
+    
+          if(type === 'INVOICE' || type === 'RECURRING INVOICE' || type === 'DEBIT NOTE' || type ==='SALES ORDER' || type === 'RETAINER INVOICE' || type === 'EMI PAID'){
+            balance += amt
+          }else{
+            balance -= amt
+          }
+        }
+  
+      }
+      console.log('balance==',balance)
+      $('#bal').text(balance)
+    }
+  
+    function filterTableByDate() {
+      var start = $('#startDate').val();
+      var end = $('#endDate').val();
+      console.log(start,end)
+      if(start != "" && end != ""){
+  
+        var startDate = new Date(start);
+        var endDate = new Date(end);
+        var table = document.getElementById('statementtable');
+        var rows = table.getElementsByTagName('tr');
+    
+        for (var i = 1; i < rows.length; i++) {
+          var row = rows[i];
+          var rowData = row.getElementsByTagName('td')[0].textContent;
+    
+          var rowDate = new Date(rowData);
+    
+          if (rowDate >= startDate && rowDate <= endDate) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        }
+        calculateBalance();
+      }else{
+        alert('Select valid Start and End dates')
+      }
+    }
+  
+    $('#toggleEmailModal').on('click',function(){
+      var st = $('#startDate').val();
+      var end = $('#endDate').val();
+      var bal = $('#bal').text();
+  
+      $('#blnc').val(bal)
+      $('#startDt').val(st)
+      $('#endDt').val(end)
+  
+      if((st != "" && end == "") || (st == "" && end != "")){
+        alert('Please select both date inputs or select none')
+        return
+      }
+  
+      $('#shareToEmail').modal('toggle');
+    });
+  
+    $('#pdfBtn').on('click',function(){
+      var st = $('#startDate').val();
+      var end = $('#endDate').val();
+      var bal = $('#bal').text();
+  
+      $('#bln').val(bal)
+      $('#startD').val(st)
+      $('#endD').val(end)
+  
+      if((st != "" && end == "") || (st == "" && end != "")){
+        alert('Please select both date inputs or select none')
+        return
+      }
+  
+      $('#pdfForm').submit();
+    });
+  
+    function printSection(sectionId) {
+      document.body.style.backgroundColor = 'white';
+      var printContents = document.getElementById(sectionId).innerHTML;
+      var originalContents = document.body.innerHTML;
+      var $printerDiv = $('<div class="printContainer"></div>');
+  
+      $printerDiv.html(printContents); 
+      $('body').append($printerDiv).addClass("printingContent"); 
+      window.print(); 
+      $printerDiv.remove();
+      $('body').removeClass("printingContent");
+    }
+    var $rows = $('#chequesTable tbody tr');
+    $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      
+      $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+      }).hide();
+    });
+    
+    document.getElementById("exportBtn").addEventListener("click", function () {
+      const Table = document.getElementById("chequesTable");
+      const ws = XLSX.utils.table_to_sheet(Table);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      XLSX.writeFile(wb, "Expense.xlsx");
+    });
+  
+  
+    function sortTable(columnIndex) {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("chequesTable");
+      switching = true;
+  
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+  
+        for (i = 1; i < (rows.length - 1); i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("td")[columnIndex].textContent.toLowerCase();
+          y = rows[i + 1].getElementsByTagName("td")[columnIndex].textContent.toLowerCase();
+  
+          if (x > y) {
+              shouldSwitch = true;
+              break;
+          }
+        }
+  
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  
+    function filterTable(row,filterValue) {
+      var table1 = document.getElementById("chequesTable");
+      var rows1 = table1.getElementsByTagName("tr");
+  
+      for (var i = 1; i < rows1.length; i++) {
+        var statusCell = rows1[i].getElementsByTagName("td")[row];
+  
+        if (filterValue == "all" || statusCell.textContent.toLowerCase() == filterValue) {
+          rows1[i].style.display = "";
+        } else {
+          rows1[i].style.display = "none";
+        }
+      }
+    }
+  
+    function sortAmountAscending() {
+      var table = document.getElementById("chequesTable");
+      var rows = Array.from(table.rows).slice(1);
+  
+      rows.sort(function (a, b) {
+        var amtA = parseFloat(a.cells[3].textContent);
+        var amtB = parseFloat(b.cells[3].textContent);
+        return amtA - amtB;
+      });
+  
+      // Remove existing rows from the table
+      for (var i = table.rows.length - 1; i > 0; i--) {
+          table.deleteRow(i);
+      }
+  
+      // Append the sorted rows back to the table
+      rows.forEach(function (row) {
+          table.tBodies[0].appendChild(row);
+      });
+    }
+  
+    
+  </script>
+  
+  <script>
+      $(document).ready(function(){
+      calculateBalance();
+    });
+    
+    function calculateBalance(){
+      var table = document.getElementById('statementtable');
+      var rows = table.getElementsByTagName('tr');
+      var balance = 0
+  
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if(row.style.display != 'none'){
+          var amt = parseFloat(row.getElementsByTagName('td')[5].textContent);
+          var type = row.getElementsByTagName('td')[1].textContent;
+    
+          if(type === 'INVOICE' || type === 'RECURRING INVOICE' || type === 'DEBIT NOTE' || type ==='SALES ORDER' || type === 'RETAINER INVOICE' || type === 'EMI PAID'){
+            balance += amt
+          }else{
+            balance -= amt
+          }
+        }
+  
+      }
+      console.log('balance==',balance)
+      $('#bal').text(balance)
+    }
+  
+  
+  
+  
+  </script>

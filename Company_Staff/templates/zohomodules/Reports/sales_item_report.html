@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinsYs</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        padding: 5px 2px;
+        /* text-align: left; */
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    
+</style>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <b>
+                            <p style="font-size: 1.3rem;">REPORT - SALES BY ITEM</p>
+                        </b>
+                        <p>
+                            {{cmp.company_name}}<br>
+                            Sales By Item
+                        </p>
+                    </center>
+                </div>
+                <hr>
+                <div style="width: 100%;">
+                    <div class="invoice_data">
+                        <div class="data_row">
+
+                        </div>
+                        <div class="data_row">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <section class="mt-4">
+                <table class="table table-responsive-md mt-4 table-hover" id="reportTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">ITEM</th>
+                            <th class="text-center">QTY.SOLD</th>
+                            <th class="text-center">PRICE</th>
+                            <th class="text-center">AMOUNT</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in combined_summary %}
+                        <tr>
+                            <td class="text-center">{{i.item_name}}</td>
+                            <td class="text-center">{{i.total_count}}</td>
+                            <td class="text-center">Rs. {{i.price }}</td>
+                            <td class="text-center">{{i.total_amount}}</td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <hr>
+            <section class="balance-info text-dark">
+                <div class="row p-4">
+                    <div class="col-10">
+                        <div class="row mb-2">
+                            <div class="col-4">Total Items : <p style="font-size: 19px;">{{total_qty|default:0}}</p>
+                            </div>
+                        </div>
+                        <table style="border: none;">
+                            <tr>
+                                <td style="padding: 10px; width: 33.33%;">Invoice Sale: <span id="totalInvoice" style="font-size: 19px;">{{tsi|default:0|floatformat:2 }}</span></td>
+                                <td style="padding: 10px; width: 33.33%;">Recurring Invoice Sale: <span id="totalReccuringinvoice" style="font-size: 19px;">{{tsr|default:0|floatformat:2}}</span></td>
+                                <td style="padding: 10px; width: 33.33%;">Credit Note: <span id="totalCreditnote" style="font-size: 19px;">{{tsc|default:0|floatformat:2}}</span></td>
+                                <td style="padding: 10px; width: 33.33%;">Total Sale: <span id="totalCreditnote" style="font-size: 19px;">{{total_sale|default:0|floatformat:2}}</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; width: 33.33%;">SubTotal: <p id="sales" style="font-size: 19px;"><span
+                                    id="totalSale">{{total_subtotal|default:0|floatformat:2}}</span></p></td>
+                                <td style="padding: 10px; width: 33.33%;">SubTotal Without Credit Note:<p id="expense"
+                                    style="font-size: 19px;"><span
+                                        id="totalSalewithoutCreditnotes">{{total_subtotalwithoutcreditnote|default:0|floatformat:2}}</span></p></td>
+                                <td style="padding: 10px; width: 33.33%;">Total Sale:<br>(Without Credit Note)<p id="purchase"
+                                    style="font-size: 19px;"><span
+                                        id="grantTotal">{{total_salewithoutcreditnote|default:0|floatformat:2}}</span></p></td>
+                            </tr>
+                        </table>
+                        
+                           
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+
+</html>

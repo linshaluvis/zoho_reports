@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retainer Invoice</title>
+    <style>
+        /* Reset CSS */
+        body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, table, tr, th, td {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .invoice-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .invoice-header h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+
+        .invoice-details p {
+            margin: 5px 0;
+        }
+
+        .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .invoice-items th, .invoice-items td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        .invoice-items th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .invoice-items td {
+            text-align: center;
+        }
+
+        .invoice-total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Retainer Invoice</h1>
+        </div>
+        <div class="invoice-details">
+            <p>Invoice Number: {{ invoice.retainer_invoice_number }}</p>
+            <!-- Add other invoice details as needed -->
+        </div>
+        <table class="invoice-items">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit_price }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="invoice-total">
+            <p>Total: {{ invoice.total_amount }}</p>
+        </div>
+    </div>
+</body>
+</html>

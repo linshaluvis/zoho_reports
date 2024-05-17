@@ -1,0 +1,25 @@
+<!-- #ashikh -->
+<table class="table text-light table-borderless" style="margin:3px; background-color: #000000;width: 100%;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Date</th>
+        <th>Action</th>
+        <th>By</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% if history %}
+        {% for i in history %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.cih.date|date:"Y-m-d"}}</td>
+            <td>{{i.action}}</td>
+            <td>{{ i.user.first_name }} {{ i.user.last_name }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <h3 style="text-align: center;">not availbale</h3>
+        {% endif %}
+    </tbody>  
+  </table>

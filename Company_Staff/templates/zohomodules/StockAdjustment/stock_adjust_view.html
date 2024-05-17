@@ -1,0 +1,958 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load social_share %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<style>
+  a{
+    list-style: none;
+    color: azure;
+  }
+
+  a:hover {
+    color: rgb(218, 164, 48);
+    text-decoration: none;
+  }
+
+  .tabcontent {
+    display: none;
+    border-top: none;
+  }
+
+  .page {
+    background: white;
+    display: block;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  }
+
+  .print-only {
+    height: auto;
+    width: auto;
+    overflow-y: auto;
+    border: none;
+  }
+
+  .label {
+    margin: 0;
+    width: 130px; 
+  }
+
+  .modal{
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  .btn-outline-warning:hover{
+    color: black;
+    font-weight:bolder;
+  }
+
+  #Overview tbody tr td{
+    border: none;
+  }
+
+  #overview_btn{
+    background-color: #ffae1f; 
+    color: black; 
+    font-weight: bold;
+  }
+
+  .modal .btn-outline-warning:hover{
+    color: black !important;
+  }
+
+  .modal{
+    margin-top: 3.5%;
+  }
+  
+  .dropdown-item:hover{
+    cursor: pointer;
+  }
+
+  .info-value {
+    flex: 1;
+  }
+
+  ::-webkit-scrollbar{
+    display: none;
+  }
+
+  .page[size="A4"] {
+    overflow: hidden;
+  }
+  
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    header {
+      display: none;
+    }
+
+    .print-only * {
+      visibility: visible;
+    }
+
+    .print-only {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      height:auto;
+      page-break-before: always;
+      page-break-inside: avoid;
+    }
+  }
+
+  .small_btn{
+    padding: 5px 9px;
+    height: 50%;
+    margin-top: 1%;
+  }
+
+  .xsmall_btn{
+    padding: 6px;
+    margin-top: 1%;
+  }
+
+  .comments-table-container {
+    max-height: 30vh;
+    overflow-y: scroll;
+  }
+
+  .history-table-container {
+    max-height: 50vh;
+    overflow-y: scroll;
+  }
+
+  .comments-table-container table, .history-table-container table {
+    width: 100%;
+  }
+
+  .comments-table-container td, .history-table-container td {
+    padding: 8px;
+    color: white;
+    text-align: center;
+  }
+
+  .comments-table-container th, .history-table-container th {
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+    color: white;
+    text-align: center;
+  }
+
+  .whatsapp-this a {
+    color: black;
+    padding-left: 15px;
+  }
+</style>
+
+<div class="body-wrapper" id="body_wrapper">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+        <li class="breadcrumb-item"><a class="text-warning-emphasis">Items</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'load_stock_adjust_list' %}" class="text-warning-emphasis">Stock Adjustment</a></li>
+        <li class="breadcrumb-item" aria-current="page" id="over">Overview</li>
+        <li class="breadcrumb-item" aria-current="page" id="trans" style="display: none;">Transactions</li>
+      </ol>
+    </nav>
+    <div class="row pt-3">
+      <div class="col-md-12">
+        <div class="card mb-5">
+          <div class="row" style="background-color: #252525;" >
+            <!-- Left Side: Table -->
+            <div class="col-md-12 col-lg-4" style="background-color: black; border-radius: 1vh;">
+              <div class="p-4"> 
+                <h6 class="pt-3" style="font-size: 1.8rem; color: white;">All Stock Adjustment</h6>
+                <div class="d-flex justify-content-between gap-1 mt-2 mr-4">
+                  <input class="form-control text-black bg-light mt-4" type="text" id="search" placeholder="Search..." style="margin-right: 10%;">
+                  <a class="btn btn-outline-warning small_btn mt-4" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                    <i class="fa fa-sort mt-1" style="font-size: small;"></i>
+                  </a>
+                  <div class="dropdown-menu ">
+                    <a class="dropdown-item text-black" href="" >All</a>
+                    <a class="dropdown-item text-black" onclick="sortTable(0)">Date</a>
+                    <a class="dropdown-item text-black" onclick="sortTable(1)">Reference No</a>
+                  </div>
+                  <a class="btn btn-outline-warning small_btn mt-4" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                    <i class="fa fa-filter" style="font-size: small;"></i>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item text-black" onclick="filterTable('All')">All</a>
+                    <a class="dropdown-item text-black" onclick="filterTable('Save')">Save</a>
+                    <a class="dropdown-item text-black" onclick="filterTable('Draft')">Draft</a>
+                  </div>
+                  <a class="btn btn-outline-warning small_btn mt-4" role="button" href="{% url 'load_stock_adjust_create' %}">
+                    <i class="fa fa-plus"></i>
+                  </a>
+                </div>
+      
+                <div class="row">
+                  <div class="col-md-12 mt-2">
+                    <div class="table-responsive">
+                      <table class="table text-white" id="sidetable">
+                        <tbody>
+                          {% for stk in all_stk_adj %}
+                          <tr onclick="window.location.href=`{% url 'load_stock_adjust_view' stk.id %}`" style="cursor: pointer;">
+                            <td>
+                              <span class="mode"><b>{{ stk.mode }}</b></span><br><br>
+                              <span class="adj_date">{{ stk.adj_date|date:'d-m-Y' }}</span>
+                            </td>
+                            <td>
+                              <span style="float: right;" class="ref">{{ stk.ref_no }}</span><br><br>
+                              <span style="float: right;" class="stat">{{ stk.status }}</span>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-12 col-lg-8">
+              <div style="background-color: black; border-radius: 1vh;">
+                <div class="card-header p-4">
+                  <h6 class="mt-3" style="font-size: 1.8rem; color: white;">Stock Adjustment</h6><br>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <a class="btn btn-outline-warning xsmall_btn" onclick="changeTab('Overview')" id="overview_btn">
+                        <i class="fa fa-eye" style="font-weight: bold; font-size: small;" id="overview_icon"></i> 
+                        <span style="font-size: small;">Overview</span>
+                      </a>
+                      <a class="btn btn-outline-warning xsmall_btn ms-1" onclick="changeTab('Transactions')" id="transaction_btn">
+                        <span class="fa fa-file-invoice" style="font-weight: bold;  font-size: small;" id="transaction_icon"></span> 
+                        <span style="font-size: small;">Transactions</span>
+                      </a>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-sm-flex" style="float: right;">
+                        {% if stk_adj.status == 'Draft' %}
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" onclick="return confirm('Do you want to convert this Draft to Saved ?')" title="CONVERT" id="convert_btn" href="{% url 'stock_adjustment_convert' stk_adj.id %}">
+                          <i class="fa fa-exchange"></i>
+                        </a>
+                        {% endif %}
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="EDIT" id="edit_btn" href="{% url 'load_stock_adjust_edit' stk_adj.id %}">
+                          <i class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" href="{% url 'stock_adjustment_delete' stk_adj.id %}" onclick="return confirm('Are you sure you want to delete this Stock Adjusment ?')" title="DELETE" id="delete_btn">
+                          <i class="fa fa-trash"></i>
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="SHARE" id="share_btn" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-share"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="share_btn">
+                          <li class="text-black">{% post_to_whatsapp object_or_url "WhatsApp" %}</li>
+                          <a class="dropdown-item text-black" data-toggle="modal" data-target="#shareToEmail">Email</a>
+                        </div>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" id="attach_btn" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-paperclip"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="attach_btn">
+                          <a class="dropdown-item text-black" data-toggle="modal" data-target="#bnk_files">Add Document</a>
+                          {% if stk_adj.file %} 
+                            <a class="dropdown-item text-black" href="{{stk_adj.file.url}}" download>Download Document</a>
+                          {% endif %}
+                        </div>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="PDF" id="pdf_btn"> 
+                          <i class="fa fa-file-pdf"></i>
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" onclick="printSection('whatToPrint1')" title="PRINT" id="print_btn">
+                          <i class="fa fa-print"></i> 
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="COMMENTS" id="comment_btn" data-toggle="modal" href="#commentsModal">
+                          <i class="fa fa-comment"></i>
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="HISTORY" id="history_btn" data-toggle="modal" href="#historyModal">
+                          <i class="fa fa-history"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div><br>
+                </div>
+
+                <div id="Overview" style="background-color: #aba9a9;">
+                  <div class="history_highlight pt-3 px-2 d-flex">
+                    <div class="col-6 d-flex justify-content-start align-items-center">
+                        {% if stk_hist_last %}
+                        {% if stk_hist_last.action == 'Created' %}
+                        <p class="m-0" style="font-size: 1.07rem; font-weight: 500; color: #017500;">Created by :</p>
+                        {% else %}
+                        <p class="m-0" style="font-size: 1.07rem; font-weight: 500; color: #E91E63;">Last Edited by :</p>
+                        {% endif %}
+                        {% endif %}
+                        <span class="ms-2" style="font-size: 1.15rem; font-weight: 500; color: #383838;">{{stk_hist_last.login_details.first_name}} {{stk_hist_last.login_details.last_name}}</span>
+                        <span class="ms-5" style="color: #383838;">{{stk_hist_last.stock_adj.adj_date}}</span>
+                    </div>
+                    <div class="col-9"></div>
+                  </div>
+                  <div class="row">
+                    <hr class="text-black" style="width: 95%; margin-left: 2.5%; margin-top: 2%;">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="px-3 py-3 mb-3 mt-3">
+                          <h5 style="text-align: left; font-weight: bold; font-size: large;">
+                            &nbsp;&nbsp;&nbsp;&nbsp;Stock Adjustment Item Details
+                          </h5>
+                          <hr class="text-black" style="margin-left: 5%; margin-right: 5%">
+                          {% for itm in stk_adj_itm %}
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Item Name</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.item.item_name }}</p>
+                          </div>
+                          {% if stk_adj.mode == 'Quantity' %}
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Quantity Available</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.current_val }}</p>
+                          </div>
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">New Quantity on Hand</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.changed_val }}</p>
+                          </div>
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Quantity Adjusted</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.adjusted_val }}</p>
+                          </div>
+                          {% else %}
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Current Value</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.current_val }}</p>
+                          </div>
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Changed Value</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.changed_val }}</p>
+                          </div>
+                          <div class="d-flex px-3 justify-content-between text-black mb-2">
+                            <h6 class="mb-0">Adjusted Value</h6>
+                            <p class="mb-0 text-right fw-bold">{{ itm.adjusted_val }}</p>
+                          </div>
+                          {% endif %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="px-3 py-3 mb-3" style="background-color: black; border-radius: 6px;">
+                          <h4 class="text-white my-3" style="text-align: center;">Stock Adjustment Details</h4>
+                          <hr class="text-white" style="margin-left: 5%; margin-right: 5%">
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white" style="font-weight: 900; font-size: large;">Status</h6>
+                            {% if stk_adj.status == 'Draft' %}
+                              <span class="text-info h5" style="font-weight: 600; margin-left: 10%;">DRAFT</span>
+                            {% else %}
+                              <span class="text-warning h5" style="font-weight: 600;">SAVE</span>
+                            {% endif %}
+                          </div>
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Mode of Adjustment</h6>
+                            {{ stk_adj.mode }}
+                          </div>
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Reference No.</h6>
+                            {{ stk_adj.ref_no }}
+                          </div>
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Date</h6>
+                            {{ stk_adj.adj_date|date:'d-m-Y' }}
+                          </div>
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Account</h6>
+                            {{ stk_adj.account }}
+                          </div>
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Reason</h6>
+                            {{ stk_adj.reason }}
+                          </div>
+                          {% if stk_adj.desc %}
+                          <div class="d-flex justify-content-between p-2 text-white">
+                            <h6 class="text-white">Description</h6>
+                            {{ stk_adj.desc }}
+                          </div>
+                          {% endif %}
+                          <hr class="text-white">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tabcontent" id="Transactions">
+                  <div  id="whatToPrint" class="print-only">
+                    <div id="whatToPrint1" class="printTemplates">
+                      <div class="page" size="A4">
+                        <div class="p-4">
+                          <div id="ember2512" class="tooltip-container ember-view ribbon text-ellipsis">
+                            <section>
+                              <div class="row py-3 bg-warning align-items-center">
+                                <div class="col-3">
+                                  <span class="bg-white text-black px-4 py-2" style="border-radius: 3px;">{{stk_adj.status}}</span>
+                                </div>
+                                <div class="col-1"></div>
+                                <div class="col-6">
+                                  <h4 class="text-white p-2 fw-bold">STOCK ADJUSTMENT</h4>
+                                </div>
+                              </div>
+                            </section>
+                            <br>
+                            <section class="store-user mt-2">
+                              <div class="row">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-8 col-sm-12">
+                                  <div class="d-flex justify-content-between px-3 text-black mb-2">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Mode of Adjustment</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.mode }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="d-flex px-3 justify-content-between text-black mb-2 mt-4">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Reference No.</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.ref_no }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="d-flex px-3 justify-content-between text-black mb-2 mt-4">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Date</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.adj_date|date:'d-m-Y' }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="d-flex px-3 justify-content-between text-black mb-2 mt-4">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Account</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.account }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="d-flex px-3 justify-content-between text-black mb-2 mt-4">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Reason</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.reason }}</p>
+                                    </div>
+                                  </div>
+                                  {% if stk_adj.desc %}
+                                  <div class="d-flex px-3 justify-content-between text-black mb-2 mt-4">
+                                    <div class="col-6">
+                                      <h6 class="mb-0">Description</h6>
+                                    </div>
+                                    <div class="col-3">
+                                      <p>:</p>
+                                    </div>
+                                    <div class="col-6">
+                                      <p class="mb-0 text-right fw-bold">{{ stk_adj.desc }}</p>
+                                    </div>
+                                  </div>
+                                  {% endif %}
+                                </div>
+                                <div class="col-md-2"></div>
+                              </div>
+                            </section>
+    
+                            <section class="table-responsive mt-4">
+                              <table class=" table table-hover table-bordered border-dark" id="templateTable1">
+                                <thead class="bg-warning">
+                                  {% if stk_adj.mode == 'Quantity' %}
+                                  <tr class="text-center text-black" style="font-weight: bold;">
+                                    <td>Item Name</td>
+                                    <td>Quantity Available</td>
+                                    <td>New Quantity on Hand</td>
+                                    <td>Quantity Adjusted</td>
+                                  </tr>
+                                  {% else %}
+                                  <tr>
+                                    <td>Item Name</td>
+                                    <td>Current Value</td>
+                                    <td>Changed Value</td>
+                                    <td>Adjusted Value</td>
+                                  </tr>
+                                  {% endif %}
+                                </thead>
+                                <tbody>
+                                  {% for itm in stk_adj_itm %}
+                                  <tr class="text-black text-center">
+                                    <td style="color:black; text-align: center;">{{ itm.item.item_name }}</td>
+                                    <td style="color:black">{{ itm.current_val }}</td>
+                                    <td style="color:black">{{ itm.changed_val }} </td>
+                                    <td style="color:black">{{ itm.adjusted_val }}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            </section>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Share Email  -->
+<div class="modal fade" id="shareToEmail">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">Share Stock Adjustment</h3>
+        <button type="button" class="btn close_email_modal close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3" style="background-color: #000;">
+        <form action="{% url 'share_stock_adjust_via_email' stk_adj.id %}" method="post" id="share_to_email_form" class="needs-validation" novalidate enctype="multipart/form-data">
+          {%csrf_token%}
+          <div class="form-group">
+            <label class="text-white" for="emailIds">Email IDs</label>
+            <textarea class="form-control text-white" name="email_ids" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+          </div>
+          <div class="form-group mt-2">
+            <label class="text-white" for="item_unitname">Message(optional)</label>
+            <textarea name="email_message" id="email_message" class="form-control text-white" cols="" rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <div class="d-flex">
+                <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="button" id="share_with_email">Send</button> 
+                <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" data-dismiss="modal" type="reset" value="Close" id="close_email_send">
+              </div>
+            </div>
+            <div class="col-md-4"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Document  -->
+<div class="modal fade" id="bnk_files">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">Add Documents</h3>
+        <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3" style="background-color: #000;">
+        <form action="{% url 'stock_adjust_file_add' stk_adj.id %}" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+          {%csrf_token%}
+          <div class="row mt-2">
+            <div class="col-md-3">
+              <label class="pt-2" for="origin" style="color: white;">Add File</label>
+            </div>
+            <div class="col-md-9">
+              <input type="file" class="form-control text-white bg-black" name="file" id="filess">
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <div class="d-flex">
+                <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="submit">Save</button> 
+                <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" data-dismiss="modal" type="reset" value="Reset">
+              </div>
+            </div>
+            <div class="col-md-4"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Comment  -->
+<div class="modal fade" id="commentsModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">Add Comments</h3>
+        <button type="button" class="btn close_comment_modal close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3" style="background-color: #000;">
+        <form method="post" class="needs-validation" novalidate enctype="multipart/form-data" id="newCommentform">
+          {%csrf_token%}
+          <div class="row mt-2">
+            <div class="col-12">
+              <textarea type="text" rows="4" class="form-control text-white" name="comment" id="comment" placeholder="Add Comments.." required></textarea>
+              {% if not stk_comment %}
+                <span class="my-2 font-weight-bold d-flex justify-content-center">No Comments.!</span>
+                {% else %}
+                <div class="container-fluid comments-table-container">
+                  <table class="table table-borderless mt-4">
+                    <thead>
+                      <tr>
+                        <th class="text-center">sl no.</th>
+                        <th class="text-center">Comment</th>
+                        <th class="text-center">Delete</th>
+                      </tr>
+                    </thead>
+                      <tbody>
+                        {% for c in stk_comment %}
+                        <tr class="">
+                          <td class="text-center">{{forloop.counter }}</td>
+                          <td class="text-center">{{ c.comment }}</td>
+                          <td class="text-center"><a class="text-danger" href="{% url 'stock_adjust_comment_delete' c.id %}" onclick="return confirm('Are you sure you want to delete.?')"><i class="fa fa-trash" style="font-size: 1.1rem;"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <div class="d-flex">
+                <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="submit" id="save_comment">Save</button> 
+                <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" data-dismiss="modal" type="reset" value="Close" id="close_comment">
+              </div>
+            </div>
+            <div class="col-md-4"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- History Modal  -->
+<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">HISTORY</h3>
+        <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3" style="background-color: #000000;">
+        <div class="container-fluid history-table-container" >
+          <table class="table text-light table-borderless" style="margin:3px; background-color: #000000;width: 100%;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Action</th>
+                <th>By</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for his in stk_hist %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ his.stock_adj.adj_date|date:'d-m-Y' }}</td>
+                <td>{{ his.action }}</td>
+                <td>{{ his.login_details.first_name }} {{ his.login_details.last_name }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>  
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-------------------------------------------------- SCRIPT ----------------------------------------------->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<!-- New Comment -->
+<script>
+  $(document).on('click', '#save_comment', function (event) {
+    event.preventDefault();
+    var comment = $("#comment").val();
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'stock_adjust_comment_create' %}",
+      data: {
+        comment: comment,
+        stk_adj_id: '{{stk_adj.id}}',
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.message === 'success') {
+          location.reload()
+        } 
+      },
+    });
+  });
+</script>
+
+<!-- Clearing Comment Form and Share Via Email Form When Closed -->
+<script>
+    $('.close_comment_modal').click(function(){
+      $('#newCommentform textarea').val('');
+    })
+
+    $('#close_comment').click(function(){
+      $('#newCommentform textarea').val('');
+    })
+
+    $('.close_email_modal').click(function(){
+      $('#share_to_email_form textarea').val('');
+    })
+
+    $('#close_email_send').click(function(){
+      $('#share_to_email_form textarea').val('');
+    })
+</script>
+
+<!-- Convert to PDF -->
+<script>
+  $(document).on('click', '#pdf_btn', function (event) {
+    event.preventDefault();
+    var element = document.getElementById('whatToPrint1') 
+    var opt =
+      {
+        margin: 1,
+        filename: 'Stock_Adjustment' + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait', }
+      };
+    html2pdf().set(opt).from(element).save();
+  });
+</script>
+
+<!-- Share Via Email -->
+<script>
+  $('#share_with_email').on('click',function(){
+    var emailsInput = document.getElementById('emailIds');
+    var emailsString = emailsInput.value.trim();
+    var emails = emailsString.split(',').map(function(email) {
+      return email.trim();
+    });
+    var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    var invalidEmails = []
+    if(emailsString == ""){
+      alert('Enter valid email addresses..')
+    }
+    else{
+      for (var i = 0; i < emails.length; i++) {
+        var currentEmail = emails[i];
+        if (currentEmail!="" && !emailRegex.test(currentEmail)) {
+          invalidEmails.push(currentEmail)
+        }
+      }
+      if(invalidEmails.length > 0){
+        alert('Invalid emails..Please check!\n'+invalidEmails)
+      }else{
+        $('#share_to_email_form').submit();
+      }
+    }
+  })
+</script>
+
+<!-- Search -->
+<script>
+  $(document).ready(function() {
+    var $rows = $('#sidetable tbody tr');
+    $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+      }).hide();
+    });
+  });
+  $('.dropdown-toggle').dropdown();
+</script>
+
+<!-- Sort -->
+<script>
+ function sortTable(col) {
+    var table = document.getElementById('sidetable');
+    var tbody = table.querySelector('tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    if (col == 1){
+      rows.sort(function(a, b) {
+        var balanceA = parseFloat(a.querySelector('.ref').innerText.replace(/[^\d.-]/g, ''));
+        var balanceB = parseFloat(b.querySelector('.ref').innerText.replace(/[^\d.-]/g, ''));
+        return balanceA - balanceB;
+      });
+    }else{
+      rows.sort(function(a, b) {
+        var nameA  = a.querySelector('.adj_date').innerText;
+        var nameB = b.querySelector('.adj_date').innerText;
+        var dateParts = nameA.split('-');
+        var year = parseInt(dateParts[2]);
+        var month = parseInt(dateParts[1]) - 1;
+        var day = parseInt(dateParts[0]);
+        var dateX = new Date(year, month, day);
+        var dateParts = nameB.split('-');
+        var year = parseInt(dateParts[2]);
+        var month = parseInt(dateParts[1]) - 1;
+        var day = parseInt(dateParts[0]);
+        var dateY = new Date(year, month, day);
+        return dateX - dateY;
+      });
+    }
+    tbody.innerHTML = '';
+    rows.forEach(function(row) {
+      tbody.appendChild(row);
+    });
+  }
+</script>
+
+<!-- Filter -->
+<script>
+  function filterTable(key) {
+    var rows = document.querySelectorAll('#sidetable tbody tr');
+    rows.forEach(function(row) {
+      var cell = row.querySelector('.stat');
+      var status = cell.innerText.trim();
+      if (key === 'All' || status === key) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+<!-- Save New File -->
+<script>
+  $(document).ready(function () {
+    $("#fileSave").click(function () {
+      var formData = new FormData();
+      formData.append('id', $("#file_id").val());
+      formData.append('file', $("#filess")[0].files[0]); 
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+      $.ajax({
+        type: 'POST',
+        url: "",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          document.getElementById("modalAddfile").reset();
+          location.reload();
+        },
+      });
+    });
+  });
+</script>
+
+<!-- Change Tab -->
+<script>
+  function changeTab(tab) {
+    if (tab === "Overview") {
+      document.getElementById('Overview').style.display = "block"; 
+      document.getElementById('overview_btn').style.backgroundColor = "#ffae1f";    
+      document.getElementById('overview_btn').style.color = "black";    
+      document.getElementById('overview_btn').style.fontWeight = 'bold';    
+      document.getElementById('overview_icon').style.fontWeight = 'bold';
+      document.getElementById('Transactions').style.display = "none"; 
+      document.getElementById('transaction_btn').style.backgroundColor = "black";    
+      document.getElementById('transaction_btn').style.color = "#ffae1f";    
+      document.getElementById('transaction_btn').style.fontWeight = 'lighter';    
+      document.getElementById('transaction_icon').style.fontWeight = 'lighter';
+      $('#convert_btn').show();
+      $('#pdf_btn').hide();
+      $('#print_btn').hide();
+      $('#edit_btn').show();
+      $('#delete_btn').show();
+      $('#share_btn').hide();
+      $('#attach_btn').show();
+      document.getElementById('over').style.display = 'block'
+      document.getElementById('trans').style.display = 'none'
+    } else {
+      document.getElementById('Overview').style.display = "none"; 
+      document.getElementById('overview_btn').style.backgroundColor = "black";    
+      document.getElementById('overview_btn').style.color = "#ffae1f";  
+      document.getElementById('overview_btn').style.fontWeight = 'lighter';    
+      document.getElementById('overview_icon').style.fontWeight = 'lighter';
+      document.getElementById('Transactions').style.display = "block"; 
+      document.getElementById('transaction_btn').style.backgroundColor = "#ffae1f";    
+      document.getElementById('transaction_btn').style.color = "black";    
+      document.getElementById('transaction_btn').style.fontWeight = 'bold';    
+      document.getElementById('transaction_icon').style.fontWeight = 'bold';
+      $('#convert_btn').hide();
+      $('#pdf_btn').show();
+      $('#print_btn').show();
+      $('#edit_btn').hide();
+      $('#delete_btn').hide();
+      $('#share_btn').show();
+      $('#attach_btn').hide();
+      document.getElementById('over').style.display = 'none'
+      document.getElementById('trans').style.display = 'block'
+    }
+  }
+</script>
+
+<!-- Print -->
+<script>
+  function printSection(sectionId) {
+    var printContents = document.getElementById(sectionId).innerHTML;
+    var originalContents = document.body.innerHTML;
+    var $printerDiv = $('<div class="printContainer"></div>');
+    $printerDiv.html(printContents); 
+    $('body').append($printerDiv).addClass("printingContent"); 
+    window.print(); 
+    $printerDiv.remove();
+    $('body').removeClass("printingContent");
+  }
+</script>
+{% endblock %}

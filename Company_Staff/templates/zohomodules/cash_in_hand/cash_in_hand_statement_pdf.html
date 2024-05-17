@@ -1,0 +1,45 @@
+<!-- ashikh -->
+<div style="padding: 5rem;" class="container-fluid table-responsive-md">
+    <br>
+    <div class="bg-dark m-0">
+        <h2 class="text-center m-0 bg-warning text-dark py-3"><strong>STATEMENT</strong></h2>
+    </div>
+    <div class="p-5 bg-light">
+        <div class="d-flex justify-content-between">
+            <div style="width: 30%;">
+                <h4 class="text-dark">{{ details.company_name|upper }}</h4>
+                <br>
+                <p class="p-0 m-0">{{ details.address }}</p>
+                <p class="p-0 m-0">pin:{{ details.pincode }}</p>
+                <p class="p-0 m-0">{{ details.city }}</p>
+                <p class="p-0 m-0">{{ details.state }}:{{ details.pincode }}</p>
+                <p class="p-0 m-0">mob:{{ details.contact }}</p>
+            </div>
+            <div style="width: 30%;">
+                <h3 class="text-end"><strong>BALANCE: {{ total_balance|floatformat:2 }}</strong></h1>
+            </div>
+        </div>
+        <table class="table mt-4 bg-dark" id="creditnotenumber_table">
+            <thead>
+                <tr class="text-center text-light">
+                    <th>#</th>
+                    <th>DATE</th>
+                    <th>TYPE</th>
+                    <th>NAME</th>
+                    <th>AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in all_query_set %}
+                <tr class='clickable-row text-center'>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="cash_date">{{ i.object_date|date:'Y-m-d' }}</td>
+                    <td>{{ i.object_type }}</td>
+                    <td>{{ i.object_name }}</td>
+                    <td class="amnt">{{ i.object_amount|floatformat:2 }}</td>
+                </tr>
+                {%endfor%}  
+            </tbody>
+        </table>
+    </div>
+</div>

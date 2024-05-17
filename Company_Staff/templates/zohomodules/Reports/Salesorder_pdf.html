@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>       
+    <div class="">
+        <div class="">
+            
+          <div> 
+                <div class=" " >
+                    
+                    
+                    <div class="row " style="display: none;">
+                        <div class="col-md-6 d-flex p-2 ">
+
+                          <div class="col-md-6">
+                            <div class="position-relative">
+                               
+                                <div id="contentDiv" class="content">
+                                    <h6 style="color: white;">Customize Report</h6>
+                                    <form action="{% url 'salesReportCustomized' %}" class="form reportCustomizeForm" method="get">
+                                        <div class="px-2">
+                                            <label style="text-align:left ">From</label><br>
+                                            <input style="color: white;" name="from_date" class="inputdate form-control" type="date" id="startDate" value="{{startDate}}">
+                                        </div>
+                                        <div class="px-2">
+                                            <label style="text-align:left ">To</label><br>
+                                            <input style="color: white;" name="to_date" type="date" class="inputdate form-control" id="endDate" value="{{endDate}}">
+                                        </div>
+                                        <div class="px-2">
+                                            <label style="text-align:left;color: white;">Sales Transaction</label><br>
+                                            <select name="transactions" style="color: white; background-color: rgb(19, 17, 17); "  id="salesTransactions" class="form-control">
+                                                <option value="all">All</option>
+                                                <option value="saved">Saved</option>
+                                                <option value="draft">Draft</option>
+                                                <option value="Converted_to_Invoice">Converted to Invoice</option>
+                                                <option value="Converted_to_RecurringInvoice">Converted to RecurringInvoice</option>
+                                            </select>
+                                        </div>
+                        
+                                        <div class="d-flex px-2 mt-3 mb-4">
+                                            <button type="submit" class="btn btn-outline-light w-50">Run Report</button>
+                                            <button type="button" onclick="resetForm(), toggleContent()" class="btn btn-outline-light ml-1 w-50">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                          </div>
+                          
+                              
+                              
+                        </div>
+                        <script>
+                            function resetForm() {
+                                document.getElementById("startDate").value = ""; 
+                                document.getElementById("endDate").value = "";   
+                                document.getElementById("salesTransactions").selectedIndex = 0; 
+                            }
+                        </script>
+                        
+                        
+                    </div>
+
+                 
+                   
+                    <!-- price lists table -->
+                    <div class="table-responsive " style="overflow-x:auto;margin-top: 20px;">
+                        <div class="card radius-15 print-only" id="pdf-card" >
+                            <div class="card-body">
+                                <div class="container-fluid">
+                    
+                                    <div  id="printReport"  class="printReportTemplate" style="display: block;">
+                                        <div class="my-5 " size="A4" >
+                                            <div id="printdiv2">
+                                                <div class="py-4 bg-warning" >
+                                                    <!-- <div id="ember2512" class="col-md-4 d-flex justify-content-start tooltip-container ember-view ribbon text-ellipsis"></div> -->
+                                                    <div class="col-12" id="printHead">
+                                                            <center ><h2>{{companyName}}</h2></center>
+                                                            <center ><h1>SALES ORDER DETAILS</h1></center>
+                                                            {% if start_date is not None and end_date is not None %}<center ><h4>{{start_date}} to {{end_date}}</h4></center>{% endif %}
+                                                            
+                                                    </div>  
+                                                    <div id="filterDateDiv"><center><span id="filterDate"></span></center></div>
+                                                </div>
+                                                <div class="row px-1 py-1">
+                                                    <div class="col-12">
+                    
+                                                        
+                                                            <div class="container-fluid table-responsive-md" id="tableDiv" >
+                                                                <table class="table mt-4" id="table" style="border: 1px solid gray; margin-top: 10px;">
+                                                                    <thead >
+                                                                        <tr class="text-center mt-5" >
+                                                                            <th class="text-center">STATUS </th>
+                                                                            <th class="text-center">DATE</th>
+                                                                            <th class="text-center">SHIPMENT DATE</th>
+                                                                            <th class="text-center">SALES ORDER NO.</th>
+                                                                            <th class="text-center">CUSTOMER NAME</th>
+                                                                            <th class="text-center">TOTAL AMOUNT</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {% for i in sale %}                                                      
+                                                                    <tr>
+                                                                        <td class="text-center">
+                                                                          {% if i.convert_to_invoice %}
+                                                                          Converted to Invoice 
+                                                                      {% elif i.convert_to_recurringinvoice %}
+                                                                          Converted to RecurringInvoice 
+                                                                      {% else %}
+                                                                      {{i.status}}
+                                                                      {% endif %}
+                                                                        </td>
+                                                                        <td class="text-center">{{i.sales_order_date|date:'d-m-Y'}}</td>
+                                                                        <td class="text-center">{{i.expiration_date|date:'d-m-Y'}}</td>
+                                                                        <td class="text-center">{{i.sales_order_number}}</td>
+                                                                        <td class="text-center">{{i.customer.first_name}} {{i.customer.last_name}}</td>
+                                                                        <td class="text-center">{{i.grand_total}}</td>
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                                <br>
+                                                
+                                                            <div class="mx-4 mt-3" style="color: rgb(103, 102, 102);font-size: large;" >
+                                                               <span for="">Total Customers : <span id="customerCount">{{totalCustomer|default:0}}</span></span>
+                                                               <label style="float: right;" >Total Sales : <span id="totvalue">₹</span id="superTotal"> {{total_sales_amount|default:0|floatformat:2}}</label>
+                                                            </div>
+                                                            </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                  
+                    
+
+<script>
+
+
+
+    // date filter
+ document.addEventListener("DOMContentLoaded", function() {
+    var form = document.querySelector('.reportCustomizeForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        
+        // Extract the selected dates
+        var fromDate = new Date(document.getElementById('startDate').value);
+        var toDate = new Date(document.getElementById('endDate').value);
+        
+        // Set the values of the "filterDate" field
+        var filterDateField = document.getElementById('filterDate');
+        filterDateField.innerHTML = fromDate.toISOString().slice(0,10) +  ' to ' +  toDate.toISOString().slice(0,10);
+        
+        // Filter table rows based on the selected dates
+        filterTableByDates(fromDate, toDate);
+    });
+});
+
+function filterTableByDates(fromDate, toDate) {
+    var tableRows = document.querySelectorAll('#table tbody tr');
+    
+    for (var i = 0; i < tableRows.length; i++) {
+        var rowDate = new Date(tableRows[i].getElementsByTagName('td')[1].textContent); // Assuming date column is the second column (index 1)
+        if (rowDate >= fromDate && rowDate <= toDate) {
+            tableRows[i].style.display = ''; // Show rows that fall within the selected date range
+        } else {
+            tableRows[i].style.display = 'none'; // Hide rows that are outside the selected date range
+        }
+    }
+    
+    // Pass the start date and end date to other functions
+    calculateTotal(fromDate, toDate);
+    displayCustomerCount(fromDate, toDate);
+}
+
+
+
+    // total credit note amount
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // Wait for the DOM to be fully loaded
+        calculateTotal();
+    });
+
+    function calculateTotal() {
+    var table = document.getElementById('table');
+    var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    var total = 0;
+    var count = 0;
+
+    // Loop through each row
+    for (var i = 0; i < rows.length; i++) {
+        // Check if the row is visible
+        if (rows[i].style.display !== 'none') {
+            var cells = rows[i].getElementsByTagName('td');
+            var amount = parseFloat(cells[cells.length - 1].textContent);
+            total += isNaN(amount) ? 0 : amount;
+            count += 1;
+        }
+    }
+
+    // Update the total in the designated element
+    document.getElementById('creditAmount').textContent = total.toFixed(2);
+    document.getElementById('customerCount').textContent = count;
+}
+
+
+
+
+
+  </script>  
+</body>
+</html>

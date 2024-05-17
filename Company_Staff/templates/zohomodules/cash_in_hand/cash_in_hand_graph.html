@@ -1,0 +1,225 @@
+<!-- Created --ashikh  -->
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href='https://unpkg.com/css.gg@2.0.0/icons/css/trash.css' rel='stylesheet'>
+<script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+<!-- chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .card{
+        background: none;
+    }
+    tbody tr td{
+        border: none;
+        border-top: none;
+        border-style: none;
+        color:azure;
+        justify-content: center;
+    }
+    tbody tr:hover{
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    thead tr th{
+        border-right: 2px solid transparent;
+    }
+
+    ul.image-bullets {
+        list-style-type: none;
+        padding-left: 30px;
+    }
+
+    ul.image-bullets li:before {
+        content: "";
+        background-image: url('static/images/bullet.png');
+        background-size: 15px 15px;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 5px; 
+        margin-left: 26%;
+    }
+    .recurpoints ul li{
+        margin-bottom: 10px;
+    }
+
+    .btn:hover{
+        color: black;
+        font-weight: bold;
+    }
+
+    a{
+        list-style: none;
+        color: azure;
+    }
+    a:hover{
+        color: rgb(218, 164, 48);
+    }
+    ::-webkit-scrollbar {
+        width: 5px; 
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888; 
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+    }
+
+    .btn-outline-warning:hover {
+        color: black !important;
+    }
+
+    .dropdown-item:hover{
+        cursor: pointer;
+    }
+</style>
+
+<style>
+.li_hover:hover{
+    background-color: black;
+    color: white;
+}
+.li_hover{
+    background-color: transparent;
+    color: gray;
+}
+</style>
+
+<div class="body-wrapper">
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-warning-emphasis" >Cash & Bank</a></li>
+          <li class="breadcrumb-item" aria-current="page">Cash In Hand</li>
+        </ol>
+    </nav>
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card mb-5 p-5" style="background-color: rgb(0, 0, 0); border-radius: 1vh;">
+                <div class="d-flex justify-content-between">
+                    <h1 style="color: rgb(255, 255, 255); font-weight: bolder;">Cash In Hand</h1>
+                    <div>
+                        <form action="{% url 'cash_in_hand_graph' 'period' %}" method="POST">
+                            {% csrf_token %}
+                            <select style="width: 100%;background-color: black;" class="form-control my-2 text-light" name="period_M_or_Y" onchange="$('#sub_btn').click()" id="period">
+                                <option selected disabled value="">Choose period</option>
+                                <option {% if period == "month" %} selected {% endif %} value="month">Month Wise</option>
+                                <option {% if period == "year" %}  selected {% endif %} value="year">Year Wise</option>
+                            </select>
+                            <button id="sub_btn" hidden  type="submit">asd</button>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                {% for message in messages %}
+                <h5>
+                  <div class="alert alert-danger message text-center" style="color: black;" id="alert_danger">
+                    {{ message }}
+                    <a type="button" id="alert_close" class="close" data-dismiss="alert" aria-label="Close" style="float: right;">
+                        <span aria-hidden="true" style="font-size: large; color: #68020F;">&times;</span>
+                    </a>
+                  </div>
+                </h5>
+                {% endfor %}
+                <!-- start -->
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
+                <!-- end -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</div> 
+
+<style>
+    .cl{
+        color:#ff5555;
+    }
+</style>
+<script>
+    if ('{{ period }}'=='month')
+    {
+        const ctx = document.getElementById('myChart');
+        Chart.defaults.borderColor = 'white';
+        Chart.defaults.color = 'white';
+        Chart.defaults.backgroundColor = 'black';
+
+
+        new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November','December'],
+            datasets: [{
+            label: 'Cash In',
+            data: JSON.parse(`{{cashIn}}`),
+            borderWidth: 2,
+            backgroundColor:"orange",
+            },
+            {
+            label: 'Cash Out',
+            data: JSON.parse(`{{cashOut}}`),
+            borderWidth: 2,
+            backgroundColor:"chocolate",
+            }]
+        },
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true
+            }
+            }
+        }
+        });
+    }
+    else{
+        const ctx = document.getElementById('myChart');
+        Chart.defaults.borderColor = 'white';
+        Chart.defaults.color = 'white';
+        Chart.defaults.backgroundColor = 'black';
+
+
+        new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: JSON.parse(`{{label|safe }}`),
+            datasets: [{
+            label: 'Cash In',
+            data: JSON.parse(`{{cashIn}}`),
+            borderWidth: 2,
+            backgroundColor:"orange",
+            },
+            {
+            label: 'Cash Out',
+            data: JSON.parse(`{{cashOut}}`),
+            borderWidth: 2,
+            backgroundColor:"chocolate",
+            }]
+        },
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true
+            }
+            }
+        }
+        });
+    }
+   </script>
+
+{% endblock %}
+

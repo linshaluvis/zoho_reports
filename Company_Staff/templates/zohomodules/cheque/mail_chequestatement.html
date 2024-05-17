@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div id="transactiondata" class="p-2">
+
+    <fieldset8 class="p-2">
+      <div class="row text-dark ">
+        <div class="col-md-8">
+          <h6 class="text-uppercase py-2">{{ details.company_name }}
+          </h6>
+        
+         <p> {{ details.contact }} <br>
+          {{ details.address }} <br>
+          {{ details.city }} <br>
+          {{ details.state|slice:'5:' }},
+          {{ details.country }} <br>
+          {{ details.pincode }}
+        </p>
+
+
+        </div>
+        <div class="col-md-4">
+          <div class="bal_section pt-4 pr-3" >
+            {% comment %} <span class="h4 font-weight-bold text-warning">TOTAL AMOUNT: <span id="bal">0</span></span> {% endcomment %}
+          </div>
+
+        <hr>
+      </div>
+
+      <div>
+        <h6 class="text-dark text-uppercase py-2">CHEQUE STATEMENT</h6>
+        <table class="transaction_table table text-dark border mb-4" id="chequesTable" style="border-collapse: collapse; width: 100%;">
+          <thead style="border: 1px solid black;">
+            <tr style="border: 1px solid black; height: 40px;">
+              <th >DATE</th>
+              <th>TYPE</th>
+              <th>NAME</th>
+              <th>REF. NO.</th>
+              <th >CHEQUE NO.</th>
+              <th>AMOUNT</th>
+            </tr>
+          </thead>
+          <tbody>
+ 
+            {% for a in invoice %}
+            <tr style="border: 1px solid black; height: 40px;">
+              <td style="text-align: center;">{{ a.date|date:'Y-m-d' }}</td>
+              <td style="text-align: center;">INVOICE</td>
+              <td style="text-align: center;">{{a.customer.first_name}} {{a.customer.last_name}}</td>
+              <td style="text-align: center;">{{a.reference_number}}</td>
+              <td style="text-align: center;">{{a.cheque_number}}</td>
+              <td style="text-align: center;">{{ a.advanced_paid }}</td>
+            </tr>
+            {% endfor %}
+
+            {% for a in recInvoice %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.start_date|date:'Y-m-d' }}</td>
+              <td>RECURRING INVOICE</td>
+              <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+              <td>{{a.reference_no}}</td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.advance_paid }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in creditNote %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.credit_note_date|date:'Y-m-d' }}</td>
+              <td>CREDIT NOTE</td>
+              <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+              <td>{{a.reference_number}}</td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.advance_paid }}</td>
+            </tr style="border: 1px solid black; height: 40px;">
+            {% endfor %}
+  
+            {% for a in salesOrder %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.sales_order_date|date:'Y-m-d' }}</td>
+              <td>SALES ORDER</td>
+              <td>{{a.customer.first_name}} {{a.customer.last_name}}</td>
+              <td>{{a.reference_number}}</td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.advanced_paid }}</td>
+            </tr style="border: 1px solid black; height: 40px;">
+            {% endfor %}
+  
+            {% for a in retainerInvoice %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.retainer.retainer_invoice_date|date:'Y-m-d' }}</td>
+              <td>RETAINER INVOICE</td>
+              <td>{{a.retainer.customer_name.first_name}} {{a.retainer.customer_name.last_name}}</td>
+              <td>{{a.retainer.refrences}}</td>
+              <td>{{a.cheque_no}}</td>
+              <td>{{ a.retainer.advance }}</td>
+
+            </tr>
+            {% endfor %}
+  
+            {% for a in bill %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.Bill_Date|date:'Y-m-d' }}</td>
+              <td>BILL</td>
+              <td>{{a.Vendor.first_name}} {{a.Vendor.last_name}}</td>
+              <td>{{a.Reference_Number}}</td>
+              <td>{{a.Cheque_Number}}</td>
+              <td>{{ a.Advance_amount_Paid }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in recurringBill %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.rec_bill_date|date:'Y-m-d' }}</td>
+              <td>RECURRING BILL</td>
+              <td>{{a.vendor_details.first_name}} {{a.vendor_details.last_name}}</td>
+              <td>{{a.recc_ref_no}}</td>
+              <td>{{a.cheque_no}}</td>
+              <td>{{ a.paid }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in purchaseOrder %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.purchase_order_date|date:'Y-m-d' }}</td>
+              <td>PURCHASE ORDER</td>
+              <td>{{a.Vendor.first_name}} {{a.Vendor.last_name}}</td>
+              <td>{{a.reference_no}}</td>
+              <td>{{a.cheque_no}}</td>
+              <td>{{ a.paid_off }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in debitNote %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.debit_note_date|date:'Y-m-d' }}</td>
+              <td>DEBIT NOTE</td>
+              <td>{{a.company.first_name}} {{a.company.last_name}}</td>
+              <td>{{a.reference_no}}</td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.advance_paid }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% comment %} {% for a in loanAccount %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.loan_date|date:'Y-m-d' }}</td>
+              <td>LOAN</td>
+              <td>{{a.bank_holder.bankname}}</td>
+              <td></td>
+              <td>{{a.cheque}}</td>
+              <td>{{ a.loan_amount }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in loanAdditional %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.Loandate|date:'Y-m-d' }}</td>
+              <td>ADDITIONAL LOAN</td>
+              <td>{{a.loan.account_name}}</td>
+              <td></td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.LoanAmount }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in emiPaid %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.loan_date|date:'Y-m-d' }}</td>
+              <td>EMI PAID</td>
+              <td>{{a.loan.account_name}}</td>
+              <td></td>
+              <td>{{a.recieved_cheque}}</td>
+              <td>{{ a.loan_amount }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in empLoan %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.loan_date|date:'Y-m-d' }}</td>
+              <td>EMPLOYEE LOAN</td>
+              <td>{{a.company.first_name}} {{a.company.last_name}}</td>
+              <td></td>
+              <td>{{a.cheque}}</td>
+              <td>{{ a.loan_amount }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in empAddLoan %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.new_date|date:'Y-m-d' }}</td>
+              <td>EMPLOYEE ADDITIONAL LOAN</td>
+              <td>{{a.employee_loan.employee.first_name}} {{a.employee_loan.employee.last_name}}</td>
+              <td></td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.new_loan }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in loanRepay %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.payment_date|date:'Y-m-d' }}</td>
+              <td>EMI PAID</td>
+              <td>{{a.employee.first_name}} {{a.employee.last_name}}</td>
+              <td></td>
+              <td>{{a.cheque_number}}</td>
+              <td>{{ a.principle_amount }}</td>
+            </tr>
+            {% endfor %}
+  
+            {% for a in empSalary %}
+            <tr style="border: 1px solid black; height: 40px; text-align: center;">
+              <td>{{ a.salary_date|date:'Y-m-d' }}</td>
+              <td>EMPLOYEE SALARY</td>
+              <td>{{a.employee.first_name}} {{a.employee.last_name}}</td>
+              <td></td>
+              <td></td>
+              <td>{{ a.total_salary }}</td>
+            </tr>
+            {% endfor %} {% endcomment %}
+          </tbody>
+        </table>
+         
+      </div>
+    </fieldset8>
+  </div>
+ 
+</body>
+</html>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6" ></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Check if there's a success message and trigger SweetAlert -->
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                swal.fire({  
+                  title: "Success!",  
+                  text: '{{ message }}',  
+                  icon: "success",  
+                  showConfirmButton: false,
+                  timer: 2900
+                });  
+                {% elif message.tags == 'error' %}
+                Swal.fire({
+                    icon: 'error',
+                    title: "Ooops Error !",  
+                    text: '{{ message }}',  
+                    showConfirmButton: false,
+                    timer: 2900
+                });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </script>
+
+
+  <script>
+    $(document).ready(function () {
+      $("#search").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#chequesTable tr").filter(function () {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+  </script>
+
+
+  <script>
+    // Add click event listener to all rows with class "clickable-row"
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        // Get the URL from the "data-href" attribute
+        const url = row.getAttribute('data-href');
+        // Navigate to the URL
+        window.location.href = url;
+      });
+    });
+  </script>
+
+
+  <script>
+
+    $(document).ready(function(){
+      calculateBalance();
+    });
+  
+    function calculateBalance(){
+      var table = document.getElementById('chequesTable');
+      var rows = table.getElementsByTagName('tr');
+      var balance = 0
+  
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if(row.style.display != 'none'){
+          var amt = parseFloat(row.getElementsByTagName('td')[5].textContent);
+          var type = row.getElementsByTagName('td')[1].textContent;
+    
+          if(type === 'INVOICE' || type === 'RECURRING INVOICE' || type === 'DEBIT NOTE' || type ==='SALES ORDER' || type === 'RETAINER INVOICE' || type === 'EMI PAID'){
+            balance += amt
+          }else{
+            balance -= amt
+          }
+        }
+  
+      }
+      console.log('balance==',balance)
+      $('#bal').text(balance)
+    }
+
+

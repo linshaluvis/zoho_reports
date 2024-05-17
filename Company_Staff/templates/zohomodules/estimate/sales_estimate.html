@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+
+<!-- bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Include jQuery from a CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
+<style>
+  #searchInput {
+      background-color: white;
+      color: black;
+      border: 1px solid orange;
+  }
+
+  a{
+    color: white;
+  }
+</style>
+
+
+<body>
+
+    <div class="body-wrapper">
+        <div class="container-fluid">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a {% if login_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item" aria-current="page">Estimate</li>
+            </ol>
+          </nav>
+
+          <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-3 p-5"> 
+            <h1 class="text-center text-white">All Estimates</h1>
+            {% for message in messages %}
+                    <h5>
+                      <div class="alert alert-danger message text-center" style="color: black;" id="alert_danger">
+                        {{ message }}
+                        <a type="button" id="alert_close" class="close" data-dismiss="alert" aria-label="Close" style="float: right;">
+                            <span aria-hidden="true" style="font-size: large; color: #68020F;">&times;</span>
+                        </a>
+                      </div>
+                    </h5>
+            {% endfor %}
+            <div class="table-responsive">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control mr-2 m-2 ">
+                    <button class="btn btn-outline-warning dropdown-toggle text-yellow mr-2 m-2" type="button" id="sortButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                    <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu2" aria-labelledby="sortButton2">
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="all">All</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="est_no">EST No</a></li>
+                    </ul>
+                </div>
+                <div>
+                  <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-filter"></i>
+                  </button>
+                  <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu3" aria-labelledby="filterButton">
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="all">All</a></li>
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Saved">Saved</a></li>
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Draft">Draft</a></li>
+                  </ul>
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" onclick="exportToExcel()"><i class="fa fa-file-export"></i>Export</button>
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" data-toggle="modal" data-target="#importModal"><i class="fa fa-file-import"></i> Import </button>
+                  <a href="{% url 'sales_estimate_new' %}" class="btn btn-outline-warning text-yellow m-2"><i class="fa fa-plus text-yellow"></i>New</a>
+                </div>
+              </div>
+
+              <table class="table mt-lg-3 rounded" style="color: white;" id="myTable">
+                <thead>
+                  <tr class="border-bottom border-dark">
+                    <th scope="col" ><b>Sl. No</b></th>
+                    <th scope="col" ><b>Date</b></th>
+                    <th scope="col" ><b>Estimate Number</b></th>
+                    <th scope="col" ><b>Customer Name</b></th>
+                    <th scope="col" ><b>Customer Mail ID</b></th>
+                    <th scope="col" ><b>Amount</b></th>
+                    <th scope="col" ><b>Status</b></th>
+                    <th scope="col" ><b>Balance</b></th>
+                    <th scope="col" ><b>Action</b></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for est in estimate %}
+                  <tr class="border-bottom border-dark">
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
+                    <td>
+                        <a href="{% url 'sales_estimate_overview' est.id %}">
+                            {% if est.converted_to_invoice %}
+                            {{est.converted_to_invoice.balance}}
+                            {% elif est.converted_to_recurring_invoice %}
+                            {{est.converted_to_recurring_invoice.balance}}
+                            {% elif est.converted_to_sales_order %}
+                            {{est.converted_to_sales_order.balance}}
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td>
+                        {% if est.converted_to_invoice %}
+                        Converted To Invoice {{est.converted_to_invoice.invoice_number}}
+                        {% elif est.converted_to_recurring_invoice %}
+                        Converted To Recurring Invoice {{est.converted_to_recurring_invoice.rec_invoice_no}}
+                        {% elif est.converted_to_sales_order %}
+                        Converted To Sales Order {{est.converted_to_sales_order.sales_order_number}}
+                        {% else %}
+
+                        <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="ConvertButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Convert
+                        </button>
+                        <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_recurring_invoice' est.id %}" >To Recurring Invoice</a></li>
+                        </ul>
+                        {% endif %}
+
+                    </td>
+                    </a>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+          <!-- Import Estimate modal -->
+        <div class="modal fade" id="importModal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content" style="background-color: #3b3b3b;">
+                    <div class="modal-header">
+                        <h3 class="modal-title text-light" id="exampleModalLabel">Import Estimate</h3>
+                        <button type="button" class="btn close text-white" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3 rounded-1" style="background-color: #000;">
+                        <div class="file_instructions">
+                            <div class="alert alert-danger" role="alert">
+                                <span class="fw-bolder">IMPORTANT:</span>
+                                <p>File should have 2 sheets named 'estimate' & 'items' and column name & order should be in the given formate(Uppercase).</p>
+                                <p class="fw-bolder">Estimate sheet - SLNO*, CUSTOMER*, ESTIMATE DATE*, PLACE OF SUPPLY*, PROFILE NAME, ENTRY TYPE, ESTIMATE NO*, TERMS*, DESCRIPTION, SUB TOTAL*, IGST*, CGST*, SGST*, TAX AMOUNT*, ADJUSTMENT, SHIPPING CHARGE, GRAND TOTAL* </p>
+                                <p class="fw-bolder">Items sheet - ESTIMATE NO**, PRODUCT*, HSN*, QUANTITY*, PRICE*, TAX PERCENTAGE*, DISCOUNT, TOTAL* </p>
+                                <p>* All required columns should be filled.</p>
+                                <p>** <b>ESTIMATE NO</b> is <b>SLNO</b> of estimate</p>
+                                <p>Place of supply should be in the give format with state code('Ex: [KL]-Kerala') or '[OT]-Other Territory'.</p>
+                                <p>Date format should be 'YYYY-MM-DD' or 'DD-MM-YYYY'.</p>
+                            </div>
+                        </div>
+                        <div class="sample_file mb-2">
+                            <a href="{% url 'download_estimate_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
+                        </div>
+                        <form id="importEstimateForm" action="{% url 'import_estimate_from_excel' %}" method="POST" class="form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="excel_file" class="form-label text-white">File</label>
+                                <input id="excel_file" class="form-control" type="file" name="excel_file" required>
+                            </div>
+                            <div class="d-flex justify-content-center mt-4">
+                                <input id="submit_import_excel" value="IMPORT" class="btn btn-outline-warning" type="submit">
+                            </div>
+                            
+                        </form>
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>
+</body>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Get the input field and table rows
+    var input = document.getElementById("searchInput");
+    var tableRows = document.querySelectorAll("#myTable tbody tr");
+
+    // Add event listener to the search input
+    input.addEventListener("input", function() {
+        var filter = input.value.toLowerCase();
+        // Loop through all table rows and hide those that don't match the search query
+        tableRows.forEach(function(row) {
+            var rowData = row.textContent.toLowerCase();
+            if (rowData.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+    // Sorting part
+    var sortButton = document.getElementById('sortButton2');
+    var sortDropdown = document.querySelector('dropdown-menu2'); // Corrected selector
+    var estimateTable = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+    var rows = estimateTable.getElementsByTagName('tr');
+
+    sortButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        sortDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!sortButton.contains(event.target)) {
+            sortDropdown.classList.remove('show');
+        }
+    });
+
+    var dropdownItems = document.querySelectorAll('#dropdown-itemsort');
+    dropdownItems.forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            var sortValue = item.getAttribute('data-sort');
+            sortTable(sortValue);
+            sortDropdown.classList.remove('show');
+        });
+    });
+
+    function sortTable(sortValue) {
+        if (sortValue === 'name') {
+            sortTableByColumn(3)
+        } else if (sortValue === 'est_no') {
+            sortTableByColumn(2); // Assuming est no  is in the third column (index 2)
+        } else if (sortValue === 'all') {
+            sortTableByColumn(0); // Sorting by the first column (Sl no.)
+        } else {
+            resetTable();
+        }
+    }
+
+    function sortTableByColumn(columnIndex) {
+        var rowsArray = Array.prototype.slice.call(rows);
+        rowsArray.sort(function (a, b) {
+            var valueA = a.cells[columnIndex].textContent.trim();
+            var valueB = b.cells[columnIndex].textContent.trim();
+
+            // If sorting by Estimate Number, convert values to numbers
+            // if (columnIndex === 2) {
+            //     return parseInt(valueA) - parseInt(valueB);
+            // }
+
+            return valueA.localeCompare(valueB);
+        });
+        reAppendRows(rowsArray);
+    }
+
+    function resetTable() {
+        for (var i = 0; i < rows.length; i++) {
+            estimateTable.appendChild(rows[i]);
+        }
+    }
+
+    function reAppendRows(sortedRows) {
+        for (var i = 0; i < sortedRows.length; i++) {
+            estimateTable.appendChild(sortedRows[i]);
+        }
+    }
+
+    // Filtering part
+    var filterButton = document.getElementById('filterButton');
+    var filterDropdown = document.getElementById('#dropdown-menu3');
+    var rows = estimateTable.getElementsByTagName('tr');
+
+    filterButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        filterDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!filterButton.contains(event.target)) {
+            filterDropdown.classList.remove('show');
+        }
+    });
+
+    var dropdownItemsFilter = document.querySelectorAll('#dropdown-itemfilter');
+    dropdownItemsFilter.forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            var filterValue = item.getAttribute('data-filter');
+            filterTable(filterValue);
+            filterDropdown.classList.remove('show');
+        });
+    });
+
+    function filterTable(filterValue) {
+    for (var i = 0; i < rows.length; i++) {
+        var statusCell = rows[i].querySelector('td:nth-child(7)'); // Assuming status is in the 7th column (index 6)
+        var status = statusCell.textContent.trim();
+
+        if (filterValue === 'all') {
+            rows[i].style.display = ''; // Show all rows if 'all' is selected
+        } else if (status === filterValue) {
+            rows[i].style.display = ''; // Show row if status matches filter value
+        } else {
+            rows[i].style.display = 'none'; // Hide row if status doesn't match filter value
+        }
+    }
+}
+});
+
+
+
+
+
+function exportToExcel() {
+    var table = document.getElementById("myTable");
+    var rows = table.rows;
+
+    var csv = [];
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cells = rows[i].cells;
+        for (var j = 0; j < cells.length - 1; j++) { // Exclude the last column
+            var cellValue = cells[j].textContent.trim();
+            if (j === 1) { // Assuming the second column contains dates
+                // Enclose date values within double quotes to handle commas
+                cellValue = '"' + cellValue + '"';
+            }
+            row.push(cellValue);
+        }
+        csv.push(row.join(','));
+    }
+    var csvString = csv.join('\n');
+
+    var blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "table_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+{% endblock %}

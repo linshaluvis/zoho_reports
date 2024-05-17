@@ -1,0 +1,801 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load social_share %}
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/print-this/printThis.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wyj73RNMIpiD6bq5D2ZAdfPI4mM1iS6L4" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-pQSMlCsIfYExBPrW+7oBntK+j8nJPNUiCkPzGBpLE7Qu6sDHd2n/ClDZs9dK+n8v" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .bar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+
+
+    }
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .bar .left input {
+        height: 5vh;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    #search-dropdown {
+        position: absolute;
+    }
+
+    @media print {
+        * {
+            background: transparent !important;
+            color: #000 !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            font-size: 100%;
+
+        }
+
+        .bar,
+        #nav1,
+        header {
+            display: none;
+        }
+
+        #div2 {
+            position: absolute;
+            top: -100px;
+            text-align: center;
+            width: 100%;
+        }
+
+
+    }
+    #customizeMenu{
+        width: fit-content;
+        height: 50vh;
+        overflow-y: auto;
+    }
+
+    :root {
+        --body-bg: rgb(204, 204, 204);
+        --white: #ffffff;
+        --darkWhite: #ccc;
+        --black: #000000;
+        --dark: #615c60;
+        --themeColor: #dfbc0c;
+        --pageShadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+    }
+    @media print {
+        body{
+            visibility: hidden !important;
+            /* background-color: white; */
+        }
+
+        .printContainer {
+            visibility: visible !important;
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+    }
+
+    .page {
+        background: var(--white);
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: var(--pageShadow);
+    }
+
+    .page[size="A4"] {
+        width: 99%;
+        height: 29.7cm;
+        overflow: hidden;
+    }
+    #reportTable {
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+    #reportTable th, #reportTable td {
+    border: 1px solid #dddddd;
+    padding: 5px 2px;
+    color: #000;
+    }
+
+    /* .whatsapp-this{
+      display: flex;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px 0px;
+    }
+
+    .whatsapp-this:hover{
+      background-color: rgb(255 255 255 / 0.21);
+    } */
+
+    .submitShareEmailBtn {
+        background: #192d3e;
+        border: 1px solid #3a4b5a;
+        border-radius: 4px;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+    }
+    .submitShareEmailBtn:hover {
+        background: #3a4b5a;
+    }
+
+    .content {
+        display: none;
+        position: absolute;
+        background-color: rgb(0, 0, 0);
+        min-width: 350px;
+        min-height: 250px;
+        padding: 10px;
+        border: 1px solid #ffffff;
+        height: fit-content;
+        z-index: 1;
+    }
+
+    .arrow {
+        /* font-size: 0.6em; */
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .arrow.up {
+        transform: rotate(180deg);
+    }
+       /* Set the color of the datepicker icon to white */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+</style>
+<style>
+    .date-cell {
+        width: 120px; /* Adjust width as needed */
+        /* Add any other styling properties as needed */
+    }
+    /* Adjustments for printing */
+@media print {
+    .totals-info {
+        
+        margin-left: 20vw;
+        margin-top: -50px;
+    }
+    .total-amount,
+    .total-balance {
+        font-size: 20px;
+        width: 25vw;
+        margin-right: -60vw;
+        padding-left: 50px;
+    }
+    .total-balance {
+        margin-top: -60px !important;
+    }
+}
+
+</style>
+<body>       
+    <div class="body-wrapper" style="width: 80%;">
+        <div class="container-fluid" >
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb text-light">
+                    {% if log_details.user_type == 'Staff' %}
+                        <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    {% if log_details.user_type == 'Company' %}
+                        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item" aria-current="page">Debit Note Datails</li>
+                </ol>
+            </nav>
+          <div> 
+                <div class=" mt-lg-4 mt-2 rounded p-4" style="background-color: rgb(0, 0, 0);color: white;">
+                    <h1 class="text-light">Debit Note Details</h1>
+                    <br>
+                   
+                    <div class="row  ">
+                        <div class="col-md-6 d-flex p-2 ">
+
+                          <div class="col-md-6">
+                            <div class="position-relative">
+                                <button class="btn btn-warning" onclick="toggleContent()"><i class="fas fa-solid fa-gear"></i> Customize Report</button>
+                                <div id="contentDiv" class="content" style="color: white;">
+                                    <h6 style="color: white;">Customize Report</h6>
+                                    <form action="#" class="form reportCustomizeForm" method="get">
+                                        <div class="px-2">
+                                            <label style="text-align:left ">From</label><br>
+                                            <input name="from_date" class="inputdate form-control text-light" type="date" id="startDate" style="color: white;" >
+                                        </div>
+                                        <div class="px-2">
+                                            <label style="text-align:left ">To</label><br>
+                                            <input name="to_date" type="date" class="inputdate form-control" id="endDate" style="color: white;" >
+                                        </div>
+                                        <div class="px-2">
+                                            <label style="text-align:left;color: white;">Status</label><br>
+                                            <select name="transactions" id="salesTransactions" class="form-control">
+                                                <option value="all">All</option>
+                                                <option value="sent">Sent</option>
+                                                <option value="Draft">Draft</option>
+                                            </select>
+                                        </div>
+                                        <div class="d-flex px-2 mt-3 mb-4">
+                                            <button type="button" onclick="runReport();toggleContent();" class="btn btn-outline-light w-50">Run Report</button>
+                                            <button type="reset" onclick="toggleContent()" class="btn btn-outline-light ml-1 w-50">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                          </div>
+                          
+                              
+                              
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div class="col-md-6 d-flex justify-content-end h-100 p-2">
+                           
+                            <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;"  onclick="ExportToExcel()" class="btn btn-outline-warning">
+                                <i class="fa fa-file-excel p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+                            </a>&nbsp;&nbsp;
+
+                            <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;"  onclick="printSection('printReport')" class="btn btn-outline-warning">
+                                <i class="fa fa fa-print p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Print</span>
+                            </a>&nbsp;&nbsp;
+                            
+                            
+                            
+                            <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" class="btn btn-outline-warning" onclick="generatePDF()" >
+                                <i class="fa fa-file-pdf-o  p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Pdf</span>
+                              </a>&nbsp;&nbsp;
+                              <div class="dropdown">
+                                <a id="share_btn" style="height: 2.4rem;" class="btn btn-outline-warning dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-share pb-2" style="font-size: large;"></i>
+                                    <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Share</span>
+                                </a>
+                                
+                                <ul class="dropdown-menu" aria-labelledby="share_btn">
+                                    <a href="#" style="color: black; text-decoration: none;"><li style="margin-left: 1.5vw;">
+                                        {% post_to_whatsapp object_or_url "WhatsApp" %}
+                                    </li></a>
+                                    <li>
+                                        <a class="dropdown-item" href="#shareToEmail" data-bs-toggle="modal" style="color: black; text-decoration: none;">Email</a>
+                                    </li>
+                                </ul>
+                                
+                            </div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                 
+                   
+                    <!-- price lists table -->
+                    <div class="table-responsive " style="overflow-x:auto;margin-top: 20px;width: 105%;margin-left: -1.5vw;">
+                        <div class="card radius-15 print-only" id="pdf-card" style="background-color: #000;" >
+                            <div class="card-body ">
+                                <div class="container-fluid" >
+                    
+                                    <div  id="printReport"  class="printReportTemplate" style="display: block; width: 100%;">
+                                        <div class="my-5 page" size="A4" >
+                                            <div id="printdiv2">
+                                                <div class="py-4 bg-warning" >
+                                                    <!-- <div id="ember2512" class="col-md-4 d-flex justify-content-start tooltip-container ember-view ribbon text-ellipsis"></div> -->
+                                                    <div class="col-12">
+                                                        <center class="h5 text-white"><b>{{allmodules.company.company_name}}</b></center>
+                                                        <center class="h3 text-white"><b>Debit Note Details</b></center>
+                                                        <div id="dateRange"></div> <!-- Element to display date range -->
+                                                    </div>
+                                                     
+                                                    <!-- <div class="col-md-4 d-flex justify-content-end"></div> -->
+                                                </div>
+                                                <div class="row px-1 py-1">
+                                                    <div class="col-12">
+                    
+                                                        <section class="product-area mt-2" id="pt">
+                                                            <table class="table table-responsive-md mt-4 table-hover" id="reportTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-center">STATUS</th>
+                                                                        <th class="text-center">DEBIT DATE</th>
+                                                                        <th class="text-center">DEBIT NOTE</th>
+                                                                        <th class="text-center w-23" style="font-family: FontAwesome, sans-serif;">
+                                                                            VENDOR NAME <i class="fas fa-caret-up arrow" onclick="sortName(0)"></i>
+                                                                        </th>
+                                                                        <th class="text-center ">DEBIT NOTE AMOUNT</th>
+                                                                        <th class="text-center">BALANCE AMOUNT</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for i in DEBIT_NOTE %}
+                                                                    <tr>
+                                                                        <td class="text-center status-cell">
+                                                                            {% if i.status == 'Saved' %}
+                                                                            Sent
+                                                                            {% else %}
+                                                                            {{i.status}}
+                                                                            {% endif %}
+                                                                        </td>
+                                                                        <td class="text-center date-cell">{{i.debitnote_date | date:'d-m-Y'}}</td>
+                                                                        <td class="text-center">{{i.debitnote_no}}</td>
+                                                                        <td class="text-center vendor-name">{{i.vendor.first_name }} {{i.vendor.last_name }}</td>
+                                                                        <td class="text-center debit-note-amount">Rs.{{i.grandtotal|default:0|floatformat:2}}</td>
+                                                                        <td class="text-center balance-amount" colspan="6">Rs. {{i.balance|default:0|floatformat:2}}</td>
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                            </div>
+                                                            <div class="totals-info text-dark" style="font-size:small;" >
+                                                                <div class="total-amount" style="margin-left: 25vw;margin-top: 5vh;font-weight: 650;font-size: 20px;">
+                                                                <span id="totalAmount"></span>
+                                                                </div>
+                                                                <div class="total-balance" style="margin-left: 45vw;margin-top: -4.5vh;font-weight: 650;font-size: 20px;">
+                                                                   <strong> <span id="totalBalance"></span></strong>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="row">
+                                                        </section>
+                                                        <section class="balance-info text-dark" style=" font-weight: 650;font-size: 20px ;">
+                                                            <div class="row p-4">
+                                                                <div class="col-10">
+                                                                    <div class="row mb-2" >
+                                                                        <strong >Total Vendors: <span id="totalVendors"></span></strong>
+                                                                    </div>
+                                                                    <br><br>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                        
+                                                        
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                                            <script>
+                                                                window.addEventListener('DOMContentLoaded', function() {
+                                                                    // Get all debit note amount elements
+                                                                    var debitNoteAmounts = document.querySelectorAll('.debit-note-amount');
+                                                                    var totalAmount = 0;
+                                                                    // Calculate total amount
+                                                                    debitNoteAmounts.forEach(function(amount) {
+                                                                        totalAmount += parseFloat(amount.textContent.replace('Rs.', '').trim());
+                                                                    });
+                                                                    // Update total amount cell
+                                                                    document.getElementById('totalAmount').textContent = 'Total Amount: Rs. ' + totalAmount.toFixed(2);
+                                                            
+                                                                    // Get all balance amount elements
+                                                                    var balanceAmounts = document.querySelectorAll('.balance-amount');
+                                                                    var totalBalance = 0;
+                                                                    // Calculate total balance
+                                                                    balanceAmounts.forEach(function(balance) {
+                                                                        totalBalance += parseFloat(balance.textContent.replace('Rs.', '').trim());
+                                                                    });
+                                                                    // Update total balance cell
+                                                                    document.getElementById('totalBalance').textContent = 'Total Balance:  Rs.' + totalBalance.toFixed(2);
+                                                                });
+                                                            </script>
+    <div class="modal fade" id="shareToEmail">
+        <div class="modal-dialog">
+          <div class="modal-content" style="background-color: #3b3b3b;">
+            <div class="modal-header">
+              <h3 class="modal-title text-light" id="exampleModalLabel">Share Debit Note</h3>
+              <button type="button" class="btn close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body mx-3" style="background-color: #000;">
+              <form action="{% url 'sharedebitReportsToEmail' %}" method="post" id="share_to_email_form" class="needs-validation" novalidate enctype="multipart/form-data">
+                {%csrf_token%}
+                <div class="form-group">
+                    <label for="emailIds">Email IDs</label>
+                    <textarea class="form-control" name="email_ids" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="item_unitname">Message(optional)</label>
+                    <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-md-4"></div>
+                  <div class="col-md-4">
+                    <div class="d-flex">
+                      <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="button" id="share_with_email" style="padding: 5px;">Send</button> 
+                      <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" data-bs-dismiss="modal" type="reset" value="Close" style="padding: 5px;">
+                    </div>
+                  </div>
+                  <div class="col-md-4"></div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer"></div>
+          </div>
+        </div>
+      </div>
+
+
+<script>
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        
+        var table = document.getElementById('table');
+        var ws = XLSX.utils.table_to_sheet(table);
+
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Journal');
+
+        var fileName = 'Journal.xlsx';
+        XLSX.writeFile(wb, fileName);
+    });
+
+    $(document).ready(function() {
+        $('.select2').select2({
+            templateResult: formatOption
+        });
+    });
+
+    function formatOption(option) {
+        if (!option.id) {
+            return option.text;
+        }
+        var $option = $(
+            '<span><i class="' + $(option.element).data('icon') + '"></i> ' + option.text + '</span>'
+        );
+        return $option;
+    }
+
+    $(document).ready(function() {
+        var $rows = $('#table tbody tr');
+        $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.show().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+        });
+    });
+
+    $(document).ready(function () {
+        $('#sort-select').change(function () {
+            var sortBy = $(this).val();
+            window.location.href = '?sortBy=' + sortBy;
+        });
+        $('#status-select').change(function () {
+            var filterByStatus = $(this).val();
+            window.location.href = '?filterByStatus=' + filterByStatus;
+        });
+    });
+</script>
+  <script>
+      $(document).ready(function(){
+        var trans = `{{transaction}}`;
+        // alert(trans)
+        if(trans != "" && trans != 'all'){
+            $('#salesTransactions').val(trans)
+        }
+    })
+    function toggleContent() {
+        var contentDiv = document.getElementById("contentDiv");
+        if (contentDiv.style.display === "block") {
+            contentDiv.style.display = "none";
+        } else {
+            contentDiv.style.display = "block";
+            // Position the div just below the button
+            // var buttonRect = event.target.getBoundingClientRect();
+            // contentDiv.style.top = (buttonRect.bottom + window.scrollY) + "px";
+            // contentDiv.style.left = buttonRect.left + "px";
+        }
+    }
+
+</script>
+
+
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+<script>
+   function ExportToExcel(){
+        const Table = document.getElementById("reportTable");
+        const ws = XLSX.utils.table_to_sheet(Table);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "Report_DebitnoteDetails.xlsx");
+    }
+
+// Function to format the date ('YYYY-MM-DD' to 'DD-MM-YYYY')
+function formatDate(dateString) {
+    var parts = dateString.split("-");
+    return parts[0] + "-" + parts[1] + "-" + parts[2];
+}
+
+function printSection(sectionId) {
+    
+    var printContents = document.getElementById(sectionId).innerHTML;
+    var originalContents = document.body.innerHTML;
+    var $printerDiv = $('<div class="printContainer"></div>');
+
+    // Set a custom width for the print container (e.g., 100% of the page width)
+    $printerDiv.css('width', '100%');
+
+    $printerDiv.html(printContents); 
+    $('body').append($printerDiv).addClass("printingContent"); 
+    window.print(); 
+    $printerDiv.remove();
+    $('body').removeClass("printingContent");
+}
+
+function generatePDF() {
+    var element = document.getElementById('reportTable'); 
+    var filename = 'Report_DebitnoteDetails.pdf';
+    var opt = {
+        margin: 1,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Increase the width of the PDF page
+    opt.jsPDF.orientation = 'landscape'; // Set the orientation to landscape
+    opt.jsPDF.format = [11, 8.5]; // Adjust the width (11 inches) as needed, and keep the height (8.5 inches) for A4 format
+    
+    html2pdf().set(opt).from(element).save();
+}
+
+  </script>  
+
+
+<script>
+function formatDate(date) {
+    var day = date.getDate();
+    var month = date.getMonth() + 1; // Months are zero indexed
+    var year = date.getFullYear();
+
+    // Add leading zeros if necessary
+    if (day < 10) {
+        day = '0' + day;
+    }
+    if (month < 10) {
+        month = '0' + month;
+    }
+
+    return day + '-' + month + '-' + year;
+}
+
+function filterTableByDateAndTransaction() {
+    var fromDate = new Date(document.getElementById("startDate").value);
+    var toDate = new Date(document.getElementById("endDate").value);
+    var selectedTransaction = document.getElementById("salesTransactions").value;
+    var tableRows = document.querySelectorAll("#reportTable tbody tr");
+
+    // Update HTML content with selected from and to dates
+    var dateRangeHTML = "";
+    if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+        dateRangeHTML = "<center class='h6 text-white'>" + formatDate(fromDate) + " &nbsp; TO &nbsp; "+ formatDate(toDate) + "</center>";
+    }
+    document.getElementById("dateRange").innerHTML = dateRangeHTML;
+
+    // Reset totals
+    var totalAmount = 0;
+    var totalBalance = 0;
+    var vendorNames = [];
+
+    tableRows.forEach(function(row) {
+        var debitDate = row.querySelector(".date-cell").textContent;
+        var debitDateParts = debitDate.split('-');
+        var formattedDebitDate = debitDateParts[2] + '-' + debitDateParts[1] + '-' + debitDateParts[0];
+        var debitDateTimestamp = new Date(formattedDebitDate).getTime();
+        var fromTimestamp = fromDate.getTime();
+        var toTimestamp = toDate.getTime();
+        var transactionStatus = row.querySelector(".status-cell").textContent.trim().toLowerCase(); // Convert to lowercase
+
+        if ((debitDateTimestamp >= fromTimestamp && debitDateTimestamp <= toTimestamp) &&
+            (selectedTransaction === 'all' || transactionStatus === selectedTransaction.toLowerCase())) {
+            row.style.display = ""; // Show row if it matches both date range and transaction
+
+            // Update totals
+            var amountCell = row.querySelector(".debit-note-amount");
+            var balanceCell = row.querySelector(".balance-amount");
+
+            if (amountCell && balanceCell) {
+                totalAmount += parseFloat(amountCell.textContent.replace('Rs.', '').trim());
+                totalBalance += parseFloat(balanceCell.textContent.replace('Rs.', '').trim());
+            }
+
+            // Update vendor names
+            var vendorCell = row.querySelector(".vendor-name");
+            if (vendorCell) {
+                var vendorName = vendorCell.textContent.trim();
+                if (!vendorNames.includes(vendorName)) {
+                    vendorNames.push(vendorName);
+                }
+            }
+        } else {
+            row.style.display = "none"; // Hide row if it doesn't match
+        }
+    });
+
+    // Update total amount cell
+    document.getElementById('totalAmount').textContent = 'Total Amount: Rs. ' + totalAmount.toFixed(2);
+
+    // Update total balance cell
+    document.getElementById('totalBalance').textContent = 'Total Balance: Rs. ' + totalBalance.toFixed(2);
+
+    // Update total vendors count
+    document.getElementById("totalVendors").innerText = vendorNames.length;
+}
+
+// Call the function when the "Run Report" button is clicked
+function runReport() {
+    filterTableByDateAndTransaction();
+}
+
+
+$(document).ready(function(){
+        $('#share_with_email').on('click',function(){
+            var emailsInput = document.getElementById('emailIds');
+            var emailsString = emailsInput.value.trim();
+
+            var emails = emailsString.split(',').map(function(email) {
+                return email.trim();
+            });
+
+            var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+            var invalidEmails = []
+            if(emailsString == ""){
+                alert('Enter valid email addresses..')
+            }
+            else{
+                for (var i = 0; i < emails.length; i++) {
+                    var currentEmail = emails[i];
+
+                    if (currentEmail!="" && !emailRegex.test(currentEmail)) {
+                        console.log(currentEmail + ' is invalid!');
+                        invalidEmails.push(currentEmail)
+                    }
+                }
+                
+                if(invalidEmails.length > 0){
+                    alert('Invalid emails..Please check!\n'+invalidEmails)
+                    // alert(invalidEmails)
+                }else{
+                    $('#share_to_email_form').submit();
+                }
+            }
+        })
+    });
+
+
+
+    let sortOrder = false; // false for ascending, true for descending
+
+function sortName(colIndex) {
+    const table = document.getElementById('reportTable');
+    const rows = Array.from(table.rows).slice(1, -1); // Exclude the last row
+
+    const isNumeric = !isNaN(parseFloat(rows[0].cells[colIndex].textContent));
+
+    rows.sort((a, b) => {
+        let aValue = a.cells[colIndex].textContent;
+        let bValue = b.cells[colIndex].textContent;
+
+        if (isNumeric) {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+        }
+
+        if (sortOrder) {
+            return aValue < bValue ? 1 : -1;
+        } else {
+            return aValue > bValue ? 1 : -1;
+        }
+    });
+
+    // Toggle arrow direction
+    const arrow = document.querySelector('.arrow');
+    if (arrow) {
+        arrow.classList.remove(sortOrder ? 'up' : 'down');
+        arrow.classList.add(sortOrder ? 'down' : 'up');
+    }
+
+    // Reorder the rows
+    rows.forEach(row => table.appendChild(row));
+
+    // Toggle sort order for the next click
+    sortOrder = !sortOrder;
+}
+
+
+
+
+ </script>
+    <script>
+        window.onload = function() {
+            updateVendorCount();
+        };
+    
+        function updateVendorCount() {
+            var vendorNames = [];
+            var rows = document.querySelectorAll("#reportTable tbody tr");
+    
+            if (rows.length === 0) {
+                console.error("No rows found in the table.");
+                return;
+            }
+    
+            rows.forEach(function(row) {
+                var vendorCell = row.querySelector(".text-center:nth-child(4)");
+                if (vendorCell) {
+                    var vendorName = vendorCell.textContent.trim();
+                    if (!vendorNames.includes(vendorName)) {
+                        vendorNames.push(vendorName);
+                    }
+                } else {
+                    console.error("Vendor name cell not found in a row.");
+                }
+            });
+    
+            var totalVendorsDiv = document.getElementById("totalVendors");
+            if (totalVendorsDiv) {
+                totalVendorsDiv.innerText = vendorNames.length;
+            } else {
+                console.error("Element with id 'totalVendors' not found.");
+            }
+        }
+    </script>
+    
+    
+</body>
+</html>
+{% endblock %}

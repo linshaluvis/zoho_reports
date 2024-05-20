@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinsYs</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        padding: 5px 2px;
+        /* text-align: left; */
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    
+</style>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <b>
+                            <p style="font-size: 1.3rem;">REPORT - VENDOR BALANCES</p>
+                        </b>
+                        <p>
+                            {{cmp.company_name}}<br>
+                            VENDOR BALANCES
+                        </p>
+                    </center>
+                </div>
+                <hr>
+                <div style="width: 100%;">
+                    <div class="invoice_data">
+                        <div class="data_row">
+
+                        </div>
+                        <div class="data_row">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <section class="mt-4">
+                <table class="table table-responsive-md mt-4 table-hover" id="reportTable">
+                    <thead>
+                        <tr>
+                            {% if cfname or clname %}
+                            <th class="text-center biggerHeader">VENDOR NAME </th>
+                            {% endif %}
+                            {% if cemail %}
+                            <th class="text-center">EMAIL</th>
+                            {% endif %}
+                            {% if cphno %}
+                            <th class="text-center">PHONE</th>
+                            {% endif %}
+                            {% if invoice_c_present %}
+                            <th class="text-center invoice-balance-col">BILL BALANCE</th>
+                        {% else %}
+                            <th class="text-center invoice-balance-col" style="display:none;">BILL BALANCE</th>
+                        {% endif %}
+                        {% if cnote_c_present %}
+                        <th class="text-center available-credits-col">AVAILABLE DEBITS</th>
+                            {% else %}
+                            <th class="text-center available-credits-col" style="display:none;">AVAILABLE DEBITS</th>
+                            {% endif %}
+                           
+                            
+                            <th class="text-center"> BALANCE</th>
+                            <th class="text-center">BALANCE </th>
+
+                        </tr>
+
+                    </tr>
+                </thead>
+                <tbody>
+<tr>
+    {% for customer in customers %}
+    <tr>
+        {% if cfname and clname %}
+        <td class="text-center">{{customer.custfname}} {{customer.custlname}}</td>
+        {% elif cfname and not clame  %}
+        <td class="text-center">{{customer.custfname}}</td>
+        {% elif not cfname and lame  %}
+        <td class="text-center">{{customer.custlname}}</td>
+        {% endif %}
+        {% if cemail %}
+        <td class="text-center">{{customer.custemail}}</td>
+        {% endif %}
+        {% if cphno %}
+        <td class="text-center">{{customer.custphno}}</td>
+        {% endif %}
+        {% if invoice_c_present %}
+        <td class="text-center  invoice-balance-col">{{ customer.invoice_balance |floatformat:2 }}</td>
+        {% else %}
+        <td class="text-center  invoice-balance-col"style="display:none;">{{ customer.invoice_balance |floatformat:2 }}</td>
+        {% endif %}
+
+        {% if cnote_c_present %}
+        <td class="text-center  available-credits-col">{{ customer.available_credits }}</td>
+        {% else %}
+        <td class="text-center  available-credits-col"style="display:none;">{{ customer.available_credits }}</td>
+        {% endif %}
+        <td class="text-center">{{ customer.total_balance }}</td>
+        <td class="text-center">{{ customer.total_balance }}</td>
+
+    </tr>
+
+
+{% endfor %}
+
+                </tbody>
+            </table>
+
+        </section>
+
+        <section class="balance-info text-dark">
+            <div class="row p-4">
+                <div class="col-10">
+                    <div class="row mb-2">
+                        <div class="col-4">Total vendors : <p style="font-size: 19px;">{{totalCustomers|default:0}}</p>
+                        </div><br><br>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 ">Bill Balance: <p id="sales" style="font-size: 19px;">Rs.<span id="totalInvoice">{{totalInvoice|default:0|floatformat:2 }}</span></p></div>
+                        <div class="col-4">Recurring Bill Balance: <p id="purchase" style="font-size: 19px;">Rs.<span id="totalReccuringinvoice">{{totalRecInvoice|default:0|floatformat:2}}</span></p></div>
+                        <div class="col-4">Debit Note: <p id="expense" style="font-size: 19px;">Rs.<span id="totalCreditnote">{{totalCreditNote|default:0|floatformat:2}}</span></p></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 "></div>
+                        <div class="col-4"></div>
+                        <div class="col-4">Total Balance:<br>(Without Debit Note)<p id="purchase" style="font-size: 19px;">Rs.<span id="grantTotal">{{total_invoice_balance|default:0|floatformat:2}}</span></p></div>
+                    </div>
+
+                </div>
+                <div class="col-2 text-center">
+                    <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Balance</h5>
+                    <h4 class="text-dark" style="font-weight: 600;" id="totvalue">Rs.<span id="superTotal">{{total_balance1|default:0|floatformat:2}}</span></h4>
+                </div>
+            </div>
+        </section>
+        </div>
+    </div>
+</body>
+
+</html>

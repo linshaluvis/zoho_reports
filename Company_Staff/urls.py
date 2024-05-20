@@ -930,6 +930,8 @@ urlpatterns = [
     
     path('customerBalances',views.customerBalances,name='customerBalances'),
     path('CustomizecustomerBalances',views.CustomizecustomerBalances,name='CustomizecustomerBalances'),
+    path('sharecustomerBalances',views.sharecustomerBalances,name='sharecustomerBalances'),
+
 
 
 

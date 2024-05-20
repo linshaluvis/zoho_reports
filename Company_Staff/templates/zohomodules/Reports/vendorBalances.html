@@ -233,7 +233,7 @@
                     {% if log_details.user_type == 'Company' %}
                         <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning">Dashboard</a></li>
                     {% endif %}
-                    <li class="breadcrumb-item" aria-current="page">customer balances</li>
+                    <li class="breadcrumb-item" aria-current="page">Vendor balances</li>
                 </ol>
             </nav>
           <div> 
@@ -261,7 +261,7 @@
                 });
             </script>
                 <div class=" mt-lg-4 mt-2 rounded p-4" style="background-color: rgb(0, 0, 0);color: white;">
-                    <h3 class="text-light">CUSTOMER BALANCES</h3>
+                    <h3 class="text-light">VENDOR BALANCES</h3>
                     <br>
                    
                     <div class="row  ">
@@ -293,7 +293,7 @@
                                                 <input name="to_date" type="date"   class="inputdate  mt-2 form-control text-light" id="endDate" value="{{end_date}}">
                                             </div>
                                             <div class="px-2 mt-2">
-                                                <label style="text-align:left;color: white;">Customer Name </label><br>
+                                                <label style="text-align:left;color: white;">Vendors Name </label><br>
                                                 <select name="transactions" id="salesTransactions" class="form-control  mt-2 text-light" style="background-color: #000;">
                                                     <option value="all">All</option>
                                                     {% for customer in cust %}
@@ -303,18 +303,18 @@
                                             </div>
                                             <div class="px-2 mt-2">
                                                 <div class="d-flex">
-                                                    <input type="checkbox" name="include_invoice"><label class="mt-2 ml-3" style="text-align:left">Include Invoice Balance</label>
+                                                    <input type="checkbox" name="include_invoice"><label class="mt-2 ml-3" style="text-align:left">Include Bill Balance</label>
                                                 </div>
                                             </div>
                                             <div class="px-2 mt-2">
                                                 <div class="d-flex">
-                                                    <input type="checkbox" name="include_cnote"><label class="mt-2 ml-3" style="text-align:left ">Include Available Credits</label>
+                                                    <input type="checkbox" name="include_cnote"><label class="mt-2 ml-3" style="text-align:left ">Include Available Debits</label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div id="col_row_cust" style="display: none;">
                                             <div class="px-2  mt-2">
-                                                <label style="text-align:left; font-size: large;">Customer</label><br>
+                                                <label style="text-align:left; font-size: large;">Vendors</label><br>
                                                 
                                                 <div class="row mt-2">
                                                     <div class="col-1">
@@ -422,7 +422,7 @@
                                                     <!-- <div id="ember2512" class="col-md-4 d-flex justify-content-start tooltip-container ember-view ribbon text-ellipsis"></div> -->
                                                     <div class="col-12">
                                                             <center class="h5 text-white"><b>{{cmp.company_name}}</b></center>
-                                                            <center class="h3 text-white"><b>CUSTOMER BALANCES</b></center>
+                                                            <center class="h3 text-white"><b>VENDOR BALANCES</b></center>
                                                             {% if start_date and end_date %}
                                                             <center class="h6 text-white">{{start_date}} TO {{end_date}}</center>
                                                             {% endif %}
@@ -438,7 +438,7 @@
                                                                     <tr>
                                                                         <tr>
                                                                             {% if cfname or clname %}
-                                                                            <th class="text-center biggerHeader">CUSTOMER NAME </th>
+                                                                            <th class="text-center biggerHeader">VENDOR NAME </th>
                                                                             {% endif %}
                                                                             {% if cemail %}
                                                                             <th class="text-center">EMAIL</th>
@@ -447,14 +447,14 @@
                                                                             <th class="text-center">PHONE</th>
                                                                             {% endif %}
                                                                             {% if invoice_c_present %}
-                                                                            <th class="text-center invoice-balance-col">INVOICE BALANCE</th>
+                                                                            <th class="text-center invoice-balance-col">BILL BALANCE</th>
                                                                         {% else %}
-                                                                            <th class="text-center invoice-balance-col" style="display:none;">INVOICE BALANCE</th>
+                                                                            <th class="text-center invoice-balance-col" style="display:none;">BILL BALANCE</th>
                                                                         {% endif %}
                                                                         {% if cnote_c_present %}
-                                                                        <th class="text-center available-credits-col">AVAILABLE CREDITS</th>
+                                                                        <th class="text-center available-credits-col">AVAILABLE DEBITS</th>
                                                                             {% else %}
-                                                                            <th class="text-center available-credits-col" style="display:none;">AVAILABLE CREDITS</th>
+                                                                            <th class="text-center available-credits-col" style="display:none;">AVAILABLE DEBITS</th>
                                                                             {% endif %}
                                                                            
                                                                             
@@ -510,18 +510,18 @@
                                                             <div class="row p-4">
                                                                 <div class="col-10">
                                                                     <div class="row mb-2">
-                                                                        <div class="col-4">Total customers : <p style="font-size: 19px;">{{totalCustomers|default:0}}</p>
+                                                                        <div class="col-4">Total Vendors : <p style="font-size: 19px;">{{totalCustomers|default:0}}</p>
                                                                         </div><br><br>
                                                                     </div>
                                                                     <div class="row mb-2">
-                                                                        <div class="col-4 ">Invoice Balance: <p id="sales" style="font-size: 19px;">₹<span id="totalInvoice">{{totalInvoice|default:0|floatformat:2 }}</span></p></div>
-                                                                        <div class="col-4">Recurring Invoice Balance: <p id="purchase" style="font-size: 19px;">₹<span id="totalReccuringinvoice">{{totalRecInvoice|default:0|floatformat:2}}</span></p></div>
-                                                                        <div class="col-4">Credit Note: <p id="expense" style="font-size: 19px;">₹<span id="totalCreditnote">{{totalCreditNote|default:0|floatformat:2}}</span></p></div>
+                                                                        <div class="col-4 ">Bill Balance: <p id="sales" style="font-size: 19px;">₹<span id="totalInvoice">{{totalInvoice|default:0|floatformat:2 }}</span></p></div>
+                                                                        <div class="col-4">Recurring Bill Balance: <p id="purchase" style="font-size: 19px;">₹<span id="totalReccuringinvoice">{{totalRecInvoice|default:0|floatformat:2}}</span></p></div>
+                                                                        <div class="col-4">Debit Note: <p id="expense" style="font-size: 19px;">₹<span id="totalCreditnote">{{totalCreditNote|default:0|floatformat:2}}</span></p></div>
                                                                     </div>
                                                                     <div class="row mb-2">
                                                                         <div class="col-4 "></div>
                                                                         <div class="col-4"></div>
-                                                                        <div class="col-4">Total Balance:<br>(Without Credit Note)<p id="purchase" style="font-size: 19px;">₹<span id="grantTotal">{{total_invoice_balance|default:0|floatformat:2}}</span></p></div>
+                                                                        <div class="col-4">Total Balance:<br>(Without Debit Note)<p id="purchase" style="font-size: 19px;">₹<span id="grantTotal">{{total_invoice_balance|default:0|floatformat:2}}</span></p></div>
                                                                     </div>
                                                 
                                                                 </div>
@@ -548,7 +548,7 @@
         <div class="modal-dialog">
           <div class="modal-content" style="background-color: #3b3b3b;">
             <div class="modal-header">
-              <h3 class="modal-title text-light" id="exampleModalLabel">Share Customer Balances </h3>
+              <h3 class="modal-title text-light" id="exampleModalLabel">Share Vendors Balances </h3>
               <button type="button" class="btn close" data-dismiss="modal" onclick="closeModal()" aria-label="Close">
                 <span aria-hidden="true" style="font-size: x-large;">&times;</span>
               </button>
@@ -732,7 +732,7 @@
         var opt =
         {
             margin: [0.5, 0.3, 0.3, 0.5],
-            filename: 'CustomerBalances_report',
+            filename: 'vendorBalances_report',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
@@ -758,7 +758,7 @@
         const ws = XLSX.utils.table_to_sheet(Table);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "CustomerBalances_report.pdf.xlsx");
+        XLSX.writeFile(wb, "vendorsBalances_report.pdf.xlsx");
     }
 
     let sortOrder = false; // false for ascending, true for descending

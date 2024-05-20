@@ -42799,6 +42799,10 @@ def customerBalances(request):
         # Initialize total balance outside the loop
         for customer in cust:
             customerName = customer.first_name +" "+customer.last_name
+            custemail = customer.customer_email
+            custfname = customer.first_name
+            custlname = customer.last_name
+            custphno = customer.customer_mobile
             print(customerName)
 
             invoices = invoice.objects.filter(customer=customer, status='Saved')
@@ -42830,7 +42834,11 @@ def customerBalances(request):
 
 
             customers_data.append({
-                'name': customerName,                
+                'name': customerName, 
+                'custemail':custemail,
+                'custfname': custfname,
+                'custlname': custlname,
+                'custphno': custphno,               
                 'invoice_balance': total_invoice_balance,
                 'available_credits': available_credits,
                 'total_balance': total_balance,
@@ -42853,6 +42861,10 @@ def customerBalances(request):
             'total_invoice_balance':total_invoice_balance1,
             'invoice_c_present': True,
             'cnote_c_present': True,
+            'cemail':None, 
+            'cfname':'on', 
+            'clname':'on', 
+            'cphno':None
 
              }
         
@@ -42873,6 +42885,7 @@ def CustomizecustomerBalances(request):
             dash_details = StaffDetails.objects.get(login_details=log_details)
 
         # rec = RecurringInvoice.objects.filter(company = cmp)
+        allmodules= ZohoModules.objects.get(company = cmp)
         allmodules= ZohoModules.objects.get(company = cmp)
         cust = Customer.objects.filter(company=cmp)
 
@@ -43114,7 +43127,9 @@ def CustomizecustomerBalances(request):
             'total_balance1': total_balance1,
             'cmp': cmp,
             'allmodules': allmodules,
-            
+            'details':dash_details,
+            'log_details':log_details , 
+
             'totalCustomers': totCust,
             'totalInvoice': invoice_balance1,
             'totalRecInvoice': recurring_invoice_balance1,
@@ -43135,4 +43150,133 @@ def CustomizecustomerBalances(request):
         return redirect('/')
         
 
- 
+def sharecustomerBalances(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+
+        # rec = RecurringInvoice.objects.filter(company = cmp)
+        allmodules= ZohoModules.objects.get(company = cmp)
+    
+    
+        
+        cust = Customer.objects.filter(company=cmp) 
+
+        if request.method == 'POST':
+            emails_string = request.POST['email_ids']
+
+            # Split the string by commas and remove any leading or trailing whitespace
+            emails_list = [email.strip() for email in emails_string.split(',')]
+            email_message = request.POST['email_message']
+            print(emails_list)
+        
+            startDate = request.POST['start']
+            endDate = request.POST['end']
+            if startDate == "":
+                startDate = None
+            if endDate == "":
+                endDate = None
+            cust = Customer.objects.filter(company=cmp) 
+
+            print(cust)
+
+            customers_data = []
+            total_balance1 = 0 
+            invoice_balance1=0
+            recurring_invoice_balance1=0
+            available_credits1=0
+            total_invoice_balance1=0
+
+            # Initialize total balance outside the loop
+            for customer in cust:
+                customerName = customer.first_name +" "+customer.last_name
+                customerName = customer.first_name +" "+customer.last_name
+                custemail = customer.customer_email
+                custfname = customer.first_name
+                custlname = customer.last_name
+                custphno = customer.customer_mobile
+
+                invoices = invoice.objects.filter(customer=customer, status='Saved')
+                recurring_invoices = RecurringInvoice.objects.filter(customer=customer, status='Saved')
+                credit_notes = Credit_Note.objects.filter(customer=customer, status='Saved')
+                        
+                invoice_balance = sum(float(inv.balance) for inv in invoices)
+                recurring_invoice_balance = sum(float(rec_inv.balance) for rec_inv in recurring_invoices)
+                total_invoice_balance = invoice_balance + recurring_invoice_balance
+                
+                available_credits = sum(float(credit_note.balance) for credit_note in credit_notes)
+                
+                total_balance = total_invoice_balance - available_credits
+                
+                # Update the total balance
+                total_balance1 += total_balance
+                totCust = len(cust)
+                invoice_balance1 += invoice_balance
+                recurring_invoice_balance1 += recurring_invoice_balance
+                available_credits1 += available_credits
+                total_invoice_balance1+=total_invoice_balance
+
+
+
+                customers_data.append({
+                    'name': customerName,  
+                    'custemail':custemail,
+                    'custfname': custfname,
+                    'custlname': custlname,
+                    'custphno': custphno,              
+                    'invoice_balance': total_invoice_balance,
+                    'available_credits': available_credits,
+                    'total_balance': total_balance,
+                })
+            
+            context = {
+                    'cust':cust,
+                    'customers': customers_data,
+                    'total_balance1': total_balance1,
+                    'allmodules':allmodules,
+                    'details':dash_details,
+                    'log_details':log_details , 
+                    'cmp':cmp,
+                    'totalCustomers':totCust,
+                    'totalInvoice':invoice_balance1,
+                    'totalRecInvoice':recurring_invoice_balance1, 
+                    'totalCreditNote': available_credits1,
+                    'invoice_balance':total_invoice_balance,
+                    'available_credits': available_credits,
+                    'total_invoice_balance':total_invoice_balance1,
+                    'invoice_c_present': True,
+                    'cnote_c_present': True,
+                    'cemail':None, 
+                    'cfname':'on', 
+                    'clname':'on', 
+                    'cphno':None
+                }
+        
+
+            template_path = 'zohomodules/Reports/sharecustomerBalancesPDF.html'
+            template = get_template(template_path)
+            html = template.render(context)
+            result = BytesIO()
+            pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+            pdf = result.getvalue()
+
+            filename = f'customerBalances'
+            subject = f"customerBalances"
+            email = EmailMsg(
+                subject,
+                f"Hi,\nPlease find the attached customerBalances Reports for\n{email_message}\n\n--\nRegards,\n{cmp.company_name}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact}",
+                from_email=settings.EMAIL_HOST_USER,
+                to=emails_list
+            )
+            email.attach(filename, pdf, "application/pdf")
+            email.send(fail_silently=False)
+
+            messages.success(request, 'customerBalances Reports has been shared via email successfully..!')
+            return redirect(customerBalances)
+            

@@ -1,3 +1,4 @@
+
 def customerBalances(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -32,6 +33,10 @@ def customerBalances(request):
         # Initialize total balance outside the loop
         for customer in cust:
             customerName = customer.first_name +" "+customer.last_name
+            custemail = customer.customer_email
+            custfname = customer.first_name
+            custlname = customer.last_name
+            custphno = customer.customer_mobile
             print(customerName)
 
             invoices = invoice.objects.filter(customer=customer, status='Saved')
@@ -63,7 +68,11 @@ def customerBalances(request):
 
 
             customers_data.append({
-                'name': customerName,                
+                'name': customerName, 
+                'custemail':custemail,
+                'custfname': custfname,
+                'custlname': custlname,
+                'custphno': custphno,               
                 'invoice_balance': total_invoice_balance,
                 'available_credits': available_credits,
                 'total_balance': total_balance,
@@ -86,6 +95,10 @@ def customerBalances(request):
             'total_invoice_balance':total_invoice_balance1,
             'invoice_c_present': True,
             'cnote_c_present': True,
+            'cemail':None, 
+            'cfname':'on', 
+            'clname':'on', 
+            'cphno':None
 
              }
         
@@ -93,6 +106,172 @@ def customerBalances(request):
     else:
         return redirect('/')
     
+    
+    
+    
+    
+def shareSalesReportsToEmail(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details = LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            com = StaffDetails.objects.get(login_details=log_details).company
+
+        if request.method == 'POST':
+            emails_string = request.POST.get('email_ids', '')
+            emails_list = [email.strip() for email in emails_string.split(',') if email.strip()]
+            email_message = request.POST.get('email_message', '')
+            totalCustomer = request.POST.get('count', '')  
+            total_sales_amount = request.POST.get('total_sales','')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+
+            if start_date and end_date:
+                itms = SaleOrder.objects.filter(Q(company=com) & Q(sales_order_date__range=[start_date, end_date]))
+            else:
+                itms = SaleOrder.objects.filter(company=com)
+
+            context = {
+                'sale': itms,
+                'cmp': com,
+                'companyName': com.company_name,
+                'total_sales_amount': total_sales_amount,
+                'totalCustomer': totalCustomer,
+                'start_date': start_date,
+                'end_date': end_date
+            }
+
+            template_path = 'zohomodules/Reports/Salesorder_pdf.html'
+            template = get_template(template_path)
+            html = template.render(context)
+            result = BytesIO()
+            pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+            pdf = result.getvalue()
+
+            filename = f'Salesorder Reports'
+            subject = f"Salesorder Reports"
+            email = EmailMsg(
+                subject,
+                f"Hi,\nPlease find the attached Salesorder Reports for\n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.state} - {com.country}\n{com.contact}",
+                from_email=settings.EMAIL_HOST_USER,
+                to=emails_list
+            )
+            email.attach(filename, pdf, "application/pdf")
+            email.send(fail_silently=False)
+
+            # messages.success(request, 'Salesorder Reports has been shared via email successfully..!')
+            return redirect(Salesorder_report)
+    # messages.error(request, 'An error occurred while sharing Salesorder Reports via email.')
+    return redirect(Salesorder_report)
+        
+def Fin_shareCustomerBalenceReportToEmail(request):
+    if 's_id' in request.session:
+        s_id = request.session['s_id']
+        data = Fin_Login_Details.objects.get(id = s_id)
+        if data.User_Type == 'Company':
+            com = Fin_Company_Details.objects.get(Login_Id=s_id)
+        else:
+            com = Fin_Staff_Details.objects.get(Login_Id = s_id).company_id
+        
+        try:
+            if request.method == 'POST':
+                emails_string = request.POST['email_ids']
+
+                # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                # print(emails_list)
+            
+                startDate = request.POST['start']
+                endDate = request.POST['end']
+                if startDate == "":
+                    startDate = None
+                if endDate == "":
+                    endDate = None
+                cust = Fin_Customers.objects.filter(Company=com)
+                print(cust)
+        
+                customers_data = []
+                total_balance1 = 0 
+                invoice_balance1=0
+                recurring_invoice_balance1=0
+                available_credits1=0
+                total_invoice_balance1=0
+
+                # Initialize total balance outside the loop
+                for customer in cust:
+                    customerName = customer.first_name +" "+customer.last_name
+                    print(customerName)
+
+                    invoices = Fin_Invoice.objects.filter(Customer=customer, status='Saved')
+                    recurring_invoices = Fin_Recurring_Invoice.objects.filter(Customer=customer, status='Saved')
+                    credit_notes = Fin_CreditNote.objects.filter(Customer=customer, status='Saved')
+                    
+                    invoice_balance = sum(float(inv.balance) for inv in invoices)
+                    recurring_invoice_balance = sum(float(rec_inv.balance) for rec_inv in recurring_invoices)
+                    total_invoice_balance = invoice_balance + recurring_invoice_balance
+                    
+                    available_credits = sum(float(credit_note.balance) for credit_note in credit_notes)
+                    
+                    total_balance = total_invoice_balance - available_credits
+                    
+                    # Update the total balance
+                    total_balance1 += total_balance
+                    totCust = len(cust)
+                    invoice_balance1 += invoice_balance
+                    recurring_invoice_balance1 += recurring_invoice_balance
+                    available_credits1 += available_credits
+                    total_invoice_balance1+=total_invoice_balance
+
+
+
+                    customers_data.append({
+                        'name': customerName,                
+                        'invoice_balance': total_invoice_balance,
+                        'available_credits': available_credits,
+                        'total_balance': total_balance,
+                    })
+                
+                context = {
+                        'customers': customers_data,
+                        'total_balance1': total_balance1,
+                        'cmp':com,
+                        'com':com,
+                        'data':data,
+                        'totalCustomers':totCust,
+                        'totalInvoice':invoice_balance1,
+                        'totalRecInvoice':recurring_invoice_balance1, 
+                        'totalCreditNote': available_credits1,
+                        'invoice_balance':total_invoice_balance,
+                        'available_credits': available_credits,
+                        'total_invoice_balance':total_invoice_balance1,
+                        'startDate':startDate, 
+                        'endDate':endDate,
+
+                    }
+            
+
+                template_path = 'company/reports/Fin_salesBalancePdf.html'
+                template = get_template(template_path)
+
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                pdf = result.getvalue()
+                filename = f'Report_CustomerBalance'
+                subject = f"Report_CustomerBalance"
+                email = EmailMessage(subject, f"Hi,\nPlease find the attached Report for - Report CustomerBalance. \n{email_message}\n\n--\nRegards,\n{com.Company_name}\n{com.Address}\n{com.State} - {com.Country}\n{com.Contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                email.attach(filename, pdf, "application/pdf")
+                email.send(fail_silently=False)
+
+                messages.success(request, 'Report has been shared via email successfully..!')
+                return redirect(Fin_customerbalence)
+        except Exception as e:
+            print(e)
+            messages.error(request, f'{e}')
+            return redirect(Fin_customerbalence) 
 
 def Fin_customize_aging_summary(request):
     if 's_id' in request.session:

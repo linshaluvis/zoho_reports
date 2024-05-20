@@ -249,7 +249,7 @@
                                 <button class="btn btn-warning" onclick="toggleContent()"><i class="fas fa-solid fa-gear"></i> Customize Report</button>
                                 <div id="contentDiv" class="content">
                                     <h6 style="color: white;">Customize Report</h6>
-                                    <form action="{% url 'Fin_journalDetailsCustomized' %}" class="form reportCustomizeForm" method="post">
+                                    <form action="{% url 'CustomizecustomerBalances' %}" class="form reportCustomizeForm" method="post">
                                         {% csrf_token %}
                                         <div class="row p-1">
                                             <div class="col-6 text-light " id="general" onclick="click_on_general()">
@@ -280,12 +280,12 @@
                                             </div>
                                             <div class="px-2 mt-2">
                                                 <div class="d-flex">
-                                                    <input type="checkbox" name="include_crd_note"><label class="mt-2 ml-3" style="text-align:left">Include Invoice Balance</label>
+                                                    <input type="checkbox" name="include_invoice"><label class="mt-2 ml-3" style="text-align:left">Include Invoice Balance</label>
                                                 </div>
                                             </div>
                                             <div class="px-2 mt-2">
                                                 <div class="d-flex">
-                                                    <input type="checkbox" name="include_manual_journal"><label class="mt-2 ml-3" style="text-align:left ">Include Available Credits</label>
+                                                    <input type="checkbox" name="include_cnote"><label class="mt-2 ml-3" style="text-align:left ">Include Available Credits</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -414,7 +414,15 @@
                                                                 <thead>
                                                                     <tr>
                                                                         <tr>
-                                                                            <th class="text-center">CUSTOMER NAME <i class="fa-solid fa-caret-up arrow" onclick="sortName(0)"></i></th>
+                                                                            {% if cfname or clname %}
+                                                                            <th class="text-center biggerHeader">CUSTOMER NAME </th>
+                                                                            {% endif %}
+                                                                            {% if cemail %}
+                                                                            <th class="text-center">EMAIL</th>
+                                                                            {% endif %}
+                                                                            {% if cphno %}
+                                                                            <th class="text-center">PHONE</th>
+                                                                            {% endif %}
                                                                             {% if invoice_c_present %}
                                                                             <th class="text-center invoice-balance-col">INVOICE BALANCE</th>
                                                                         {% else %}
@@ -438,7 +446,19 @@
                                                 <tr>
                                                     {% for customer in customers %}
                                                     <tr>
-                                                        <td class="text-center">{{ customer.name }}  </td>
+                                                        {% if cfname and clname %}
+                                                        <td class="text-center">{{customer.custfname}} {{customer.custlname}}</td>
+                                                        {% elif cfname and not clame  %}
+                                                        <td class="text-center">{{customer.custfname}}</td>
+                                                        {% elif not cfname and lame  %}
+                                                        <td class="text-center">{{customer.custlname}}</td>
+                                                        {% endif %}
+                                                        {% if cemail %}
+                                                        <td class="text-center">{{customer.custemail}}</td>
+                                                        {% endif %}
+                                                        {% if cphno %}
+                                                        <td class="text-center">{{customer.custphno}}</td>
+                                                        {% endif %}
                                                         {% if invoice_c_present %}
                                                         <td class="text-center  invoice-balance-col">{{ customer.invoice_balance |floatformat:2 }}</td>
                                                         {% else %}
@@ -465,31 +485,27 @@
                                             
                                                         <section class="balance-info text-dark">
                                                             <div class="row p-4">
-                                                               
-                                                                    <div class="col-10">
-                                                                        <div class="row mb-2">
-                                                                            <div class="col-4"><p style="font-size: 19px;"></p>
-                                                                            </div><br><br>
-                                                                        </div>
-                                                                        <div class="row ">
-                                                                            <div class="col-4 "></div>
-                                                                            <div class="col-4"></div>
-                                                                            <div class="col-4" ><h5 style="padding-top: 23px; color: #000; font-weight: bold;">Total Debit:</h5> 
-                                                                                <h4 class="text-dark" id="expense"  style="font-weight: 600;">₹<span id="totalCreditnote">{{totaldebit|default:0|floatformat:2}}</span></h4></div>
-                                                                        </div>
-                                                                        
-                                                    
+                                                                <div class="col-10">
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-4">Total customers : <p style="font-size: 19px;">{{totalCustomers|default:0}}</p>
+                                                                        </div><br><br>
                                                                     </div>
-
-                                                                    <div class="col-2 text-center">
-                                                                        <h5 style="padding-top: 70px; color: #000; font-weight: bold;">Total Credit:</h5>
-                                                                        <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{totalcredit|default:0|floatformat:2}}</span></h4>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-4 ">Invoice Balance: <p id="sales" style="font-size: 19px;">₹<span id="totalInvoice">{{totalInvoice|default:0|floatformat:2 }}</span></p></div>
+                                                                        <div class="col-4">Recurring Invoice Balance: <p id="purchase" style="font-size: 19px;">₹<span id="totalReccuringinvoice">{{totalReccuringinvoice|default:0|floatformat:2}}</span></p></div>
+                                                                        <div class="col-4">Credit Note: <p id="expense" style="font-size: 19px;">₹<span id="totalCreditnote">{{totalCreditNote|default:0|floatformat:2}}</span></p></div>
                                                                     </div>
-                                                                   
-                                                                   
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-4 "></div>
+                                                                        <div class="col-4"></div>
+                                                                        <div class="col-4">Total Balance:<br>(Without Credit Note)<p id="purchase" style="font-size: 19px;">₹<span id="grantTotal">{{total_invoice_balance|default:0|floatformat:2}}</span></p></div>
+                                                                    </div>
                                                 
                                                                 </div>
-                                                               
+                                                                <div class="col-2 text-center">
+                                                                    <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Balance</h5>
+                                                                    <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{total_balance1|default:0|floatformat:2}}</span></h4>
+                                                                </div>
                                                             </div>
                                                         </section>
                                                     </div>
@@ -585,6 +601,23 @@
         }
 
         $('#shareToEmail').modal('toggle');
+    });
+
+
+    $(document).ready(function(){
+       
+        if('{{cemail}}' != 'None'){
+            $('#cust_email_show').prop('checked', true)
+        }
+        if('{{cfname}}'  != 'None'){
+            $('#cust_fname_show').prop('checked', true)
+        }
+        if('{{clname}}'  != 'None'){
+            $('#cust_lname_show').prop('checked', true)
+        }
+        if('{{cphno}}'  != 'None'){
+            $('#cust_phone_show').prop('checked', true)
+        }
     });
 
     $(document).ready(function(){

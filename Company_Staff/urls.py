@@ -926,7 +926,11 @@ urlpatterns = [
     path('retainer_invoice_details',views.retainer_invoice_details,name='retainer_invoice_details'),
     path('Retainer_report_mail',views.Retainer_report_mail,name='Retainer_report_mail'),
     path('Retainer_invoice_custom',views.Retainer_invoice_custom,name='Retainer_invoice_custom'),
+    
+    
     path('customerBalances',views.customerBalances,name='customerBalances'),
+    path('CustomizecustomerBalances',views.CustomizecustomerBalances,name='CustomizecustomerBalances'),
+
 
 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),

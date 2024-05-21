@@ -272,7 +272,7 @@
                                 <button class="btn btn-warning" onclick="toggleContent()"><i class="fas fa-solid fa-gear"></i> Customize Report</button>
                                 <div id="contentDiv" class="content">
                                     <h6 style="color: white;">Customize Report</h6>
-                                    <form action="{% url 'CustomizecustomerBalances' %}" class="form reportCustomizeForm" method="post">
+                                    <form action="{% url 'CustomizevendorBalances' %}" class="form reportCustomizeForm" method="post">
                                         {% csrf_token %}
                                         <div class="row p-1">
                                             <div class="col-6 text-light " id="general" onclick="click_on_general()">
@@ -554,7 +554,7 @@
               </button>
             </div>
             <div class="modal-body mx-3" style="background-color: #000;">
-              <form action="{% url 'sharecustomerBalances' %}" method="post" id="share_to_email_form" class="needs-validation" novalidate enctype="multipart/form-data">
+              <form action="{% url 'sharevendorBalances' %}" method="post" id="share_to_email_form" class="needs-validation" novalidate enctype="multipart/form-data">
                 {%csrf_token%}
                 <div class="form-group">
                     <label for="emailIds">Email IDs</label>
